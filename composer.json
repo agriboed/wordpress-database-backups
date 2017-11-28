@@ -1,0 +1,13 @@
+{
+    "name": "agriboed/database-backups",
+    "authors": [
+        {
+            "name": "AGriboed",
+            "email": "alexv1rs@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": { "DatabaseBackups\\": ["src/"] }
+    }
+}

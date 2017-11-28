@@ -1,62 +1,16 @@
 <?php
-/*
-Plugin Name: Database Backups
-Description: Simple Plugin that allows do backup of database tables. Manually or auto. Простой плагин, который позволяет делать бэкапы вашей базы данных вручную, либо в атоматическом режиме.
-Version: 1.2.2.6
-Author: AGriboed
-Text Domain: database-backups
-Domain Path: /languages
-Author URI: https://v1rus.ru/
-License: GPL2
-*/
+namespace DatabaseBackups;
 
-define('PLUGIN_LINK', 'tools.php?page=database-backups');
-
-/**
- * Class DatabaseBackups
- */
-class DatabaseBackups
+class Core
 {
-    /**
-     *    Holding the singleton instance
-     */
-    private static $_instance=null;
-    /**
-     * @var $db PDO
-     * @var $tables - array of all tables of database
-     * @var $dir string - directory wich will be saved backup
-     */
-    private $db, $tables, $dir;
-
-    /**
-     * Deleted trash before save content.
-     * @var array
-     */
-    private $deleted_comments=array();
-    private $deleted_posts=array();
-
-    /**
-     * List of backups
-     * @var array
-     */
-    private $backups=array();
-
-    /**
-     * @return DatabaseBackups
-     */
-    public static function instance()
-    {
-        if (is_null(self::$_instance))
-            self::$_instance=new self();
-        return self::$_instance;
-    }
-
-    /**
-     *  Prevent from creating more instances
-     */
-    private function __clone()
-    {
-    }
+    protected static $_instance;
+    protected static $plugin_url = 'tools.php?page=database-backups';
+    protected $db;
+    protected $tables;
+    protected $dir;
+    protected $deleted_comments=array();
+    protected $deleted_posts=array();
+    protected $backups=array();
 
     /**
      *  Prevent from creating more than one instance
@@ -77,13 +31,17 @@ class DatabaseBackups
         }
     }
 
+    public function init()
+    {
+        
+    }
+
     /**
      * Check tasks from wp cron
      *
      */
     public function cronCheck()
     {
-        add_filter('cron_schedules', array(&$this, 'addSchedules'));
 
         if (!DatabaseBackupsOptions::instance()->getOption('cron'))
             return false;
@@ -98,31 +56,6 @@ class DatabaseBackups
         return true;
     }
 
-    /**
-     * Add schedules to wordpress
-     * @param $schedules
-     * @return mixed
-     */
-    public function addSchedules($schedules)
-    {
-        $schedules['weekly']=array(
-                'interval'=>60 * 60 * 24 * 7,
-                'display'=>__('Once Weekly', 'database-backups')
-        );
-        $schedules['weekly_twice']=array(
-                'interval'=>round((60 * 60 * 24 * 7) / 2),
-                'display'=>__('Twice Weekly', 'database-backups')
-        );
-        $schedules['monthly']=array(
-                'interval'=>60 * 60 * 24 * 7 * 31,
-                'display'=>__('Once Monthly', 'database-backups')
-        );
-        $schedules['monthly_twice']=array(
-                'interval'=>round((60 * 60 * 24 * 7 * 31) / 2),
-                'display'=>__('Twice Monthly', 'database-backups')
-        );
-        return $schedules;
-    }
 
     /**
      *
@@ -657,7 +590,7 @@ class DatabaseBackupsOptions
     public function render_options_page()
     {
         if (isset($_POST['do_backup_manually']) && $_POST['do_backup_manually'] == 1) {
-            if (DatabaseBackups::instance()->doBackup())
+            if (Core::instance()->doBackup())
                 echo '<div id="message" class="updated notice notice-success is-dismissible"><p>' .
                         __('Backup Created', 'database-backups') .
                         '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' .
@@ -678,10 +611,10 @@ class DatabaseBackupsOptions
         }
 
         if (isset($_GET['delete']) && !empty($_GET['delete']))
-            DatabaseBackups::instance()->deleteBackup($_GET['delete']);
+            Core::instance()->deleteBackup($_GET['delete']);
 
-        DatabaseBackups::instance()->checkOldBackups();
-        $backups=DatabaseBackups::instance()->getBackups();
+        Core::instance()->checkOldBackups();
+        $backups=Core::instance()->getBackups();
         $gzip_status=!function_exists('gzencode') ? 'disabled' : '';
         $utf8_status=!function_exists('mb_detect_encoding') ? 'disabled' : '';
         $wp_upload_dir=wp_upload_dir();
@@ -696,7 +629,7 @@ class DatabaseBackupsOptions
         $delete=self::getOption('delete') ? 'checked' : '';
         $delete_days=self::getOption('delete_days');
         $delete_copies=self::getOption('delete_copies');
-        $occupied_space=round(DatabaseBackups::instance()->occupiedSpace($backups) / 1024 / 1024, 2);
+        $occupied_space=round(Core::instance()->occupiedSpace($backups) / 1024 / 1024, 2);
         $total_free_space=round(disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1024 / 1024, 2);
 
         ?>
@@ -924,7 +857,7 @@ class DatabaseBackupsOptions
     }
 }
 
-DatabaseBackups::instance();
+Core::instance();
 
 if (is_admin())
     DatabaseBackupsOptions::instance();
