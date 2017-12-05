@@ -1,4 +1,5 @@
 <?php
+
 namespace DatabaseBackups\Core;
 
 use DatabaseBackups\Interfaces\DependencyInterface;
@@ -43,7 +44,7 @@ class Container
     public function __construct($plugin, $key)
     {
         static::$key = $key;
-        static::$basename = basename($plugin);
+        static::$basename = plugin_basename($plugin);
         static::$plugin_dir = plugin_dir_path($plugin);
         static::$plugin_url = plugin_dir_url($plugin);
     }

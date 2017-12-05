@@ -12,4 +12,8 @@ License: GPL2
 
 require __DIR__ . '/vendor/autoload.php';
 
-new DatabaseBackups\Bootstrap(__FILE__);
+try {
+    new DatabaseBackups\Bootstrap(__FILE__);
+} catch (Exception $e) {
+
+}

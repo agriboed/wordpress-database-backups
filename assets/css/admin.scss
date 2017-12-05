@@ -1,0 +1,32 @@
+.database-backups {
+  .options-wrap {
+    display: none;
+  }
+
+  .options-toggle {
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    font-weight: 400;
+  }
+
+  .options-toggle:focus {
+    box-shadow: none;
+  }
+
+  .wp-list-table span.icon {
+    margin: 0 5px 0 0;
+  }
+
+  .wp-list-table a span.icon {
+    line-height: 1.3em;
+  }
+
+  .no-backups-yet {
+    text-align: center;
+    margin: 30px 0;
+  }
+
+  .footer-buttons {
+    margin: 50px 0;
+  }
+}

@@ -3,8 +3,8 @@
 namespace DatabaseBackups;
 
 
-use DatabaseBackups\Interfaces\HooksInterface;
 use DatabaseBackups\Interfaces\DependencyInterface;
+use DatabaseBackups\Interfaces\HooksInterface;
 use DatabaseBackups\Core\Container;
 
 class Bootstrap
@@ -20,8 +20,9 @@ class Bootstrap
      * @var array
      */
     protected $autostart = [
-        \DatabaseBackups\Controller\Admin::class,
-        \DatabaseBackups\Controller\Cron::class,
+        \DatabaseBackups\Controller\AdminController::class,
+        \DatabaseBackups\Service\CronService::class,
+        \DatabaseBackups\Controller\AjaxController::class
     ];
 
     /**
