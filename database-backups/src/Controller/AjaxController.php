@@ -102,7 +102,7 @@ class AjaxController extends AbstractController
      */
     public function checkAmazonS3()
     {
-
+        return $this->response(true);
     }
 
     /**

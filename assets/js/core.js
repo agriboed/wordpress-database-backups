@@ -2,6 +2,7 @@
  * global document, $
  */
 class App {
+
     /**
      *
      */
@@ -9,7 +10,6 @@ class App {
         this.key = window.DatabaseBackups.key;
         this.url = window.DatabaseBackups.admin_url;
         this.nonce = window.DatabaseBackups.nonce;
-
         this.container = jQuery('.database-backups');
 
         //  try {
@@ -47,6 +47,10 @@ class App {
         return this;
     }
 
+    /**
+     *
+     * @returns {App}
+     */
     bindOptions() {
         let button = this.getElement('button[data-action=options-toggle]'),
             container = this.getElement('[data-container=options]');
@@ -58,6 +62,10 @@ class App {
         return this;
     }
 
+    /**
+     *
+     * @returns {App}
+     */
     bindCronOption() {
         let button = this.getElement('input#cron'),
             container = this.getElement('[data-container=cron]');
@@ -78,6 +86,10 @@ class App {
         return this;
     }
 
+    /**
+     *
+     * @returns {App}
+     */
     bindDeleteOption() {
         let button = this.getElement('input#delete'),
             container = this.getElement('[data-container=delete]');
@@ -98,6 +110,10 @@ class App {
         return this;
     }
 
+    /**
+     *
+     * @returns {App}
+     */
     bindAmazonS3Option() {
         let button = this.getElement('input#amazon_s3'),
             container = this.getElement('[data-container=amazon_s3]');
@@ -118,12 +134,49 @@ class App {
         return this;
     }
 
+    /**
+     *
+     */
     createBackupCall() {
         jQuery.ajax({
             type: 'POST',
             url: this.url,
             data: {
                 action: 'database-backups_create',
+                nonce: this.nonce,
+            },
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    deleteBackupCall() {
+        jQuery.ajax({
+            type: 'POST',
+            url: this.url,
+            data: {
+                action: 'database-backups_delete',
+                nonce: this.nonce,
+            },
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    checkAmazonS3Call() {
+        jQuery.ajax({
+            type: 'POST',
+            url: this.url,
+            data: {
+                action: 'database-backups_amazon_s3',
                 nonce: this.nonce,
             },
             success: function (data) {
