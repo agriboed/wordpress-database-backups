@@ -60,11 +60,12 @@ class AjaxController extends AbstractController
 
     /**
      * Method: POST
+     *
      * @throws \Exception
      */
     public function createBackup()
     {
-        if (!isset($_POST['do_backup_manually']) || $_POST['do_backup_manually'] !== 1) {
+        if (!isset($_POST['nonce']) || !$this->checkNonce($_POST['nonce'])) {
             return $this->response();
         }
 
@@ -72,7 +73,7 @@ class AjaxController extends AbstractController
          * @var $backupService BackupService
          */
         $backupService = $this->container->get(BackupService::class);
-        $backupService->createBackup();
+        //$backupService->createBackup();
         return $this->response(true);
     }
 

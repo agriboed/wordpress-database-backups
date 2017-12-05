@@ -16,17 +16,7 @@ class S3Service extends AbstractService
     /**
      * @var
      */
-    protected $region;
-
-    /**
-     * @var
-     */
-    protected $key;
-
-    /**
-     * @var
-     */
-    protected $secret;
+    protected $bucket;
 
     /**
      *
@@ -36,18 +26,22 @@ class S3Service extends AbstractService
     {
         $this->client = new S3Client([
             'version' => 'latest',
-            'region' => 'us-east-2',
+            'region' => OptionsService::getOption('amazon_s3_region'),
             'credentials' => [
-                'key' => 'AKIAIH67YVIVSG6YYG4A',
-                'secret' => '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',
+                'key' => OptionsService::getOption('amazon_s3_key'),
+                'secret' => OptionsService::getOption('amazon_s3_secret'),
             ]
         ]);
+
+        $this->bucket = OptionsService::getOption('amazon_s3_bucket');
     }
 
-    /**
-     * @param $key
-     */
+
     public function get($key) {
+        return $this->client->getObject(array(
+            'Bucket' => $this->bucket,
+            'Key'    => $key
+        ));
 
     }
 
@@ -58,7 +52,7 @@ class S3Service extends AbstractService
     {
         try {
             $this->client->putObject([
-                'Bucket' => 'agriboed-database-backups',
+                'Bucket' => $this->bucket,
                 'Key' => $key,
                 'Body' => fopen(__DIR__ . '/readme.txt', 'rb'),
                 'ACL' => 'private',

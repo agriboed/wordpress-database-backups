@@ -1,19 +1,18 @@
 <div class="database-backups wrap">
     <h1><?php _e('Database Backups', $data['key']); ?></h1>
     <h2>
-        <button class="button button-controls options-toggle">
+        <button class="button button-controls" data-action="options-toggle">
             <?php _e('Settings', $data['key']); ?>
         </button>
     </h2>
-    <form class="options-wrap" id="options">
+    <form class="options-wrap" data-container="options" style="display: none;">
         <table class="form-table">
-            <tbody>
             <tr>
-                <th>
+                <td>
                     <label for="directory">
                         <?php _e('Directory name', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <?php echo $data['wp_upload_dir']['baseurl']; ?>/
                     <input type="text" id="directory" name="directory"
@@ -24,11 +23,11 @@
                 </td>
             </tr>
             <tr>
-                <th>
+                <td>
                     <label for="limit">
                         <?php _e('Use limits', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="number" id="limit" min="0" max="1000" name="limit"
                            placeholder="<?php echo $data['limit']; ?>"
@@ -42,11 +41,11 @@
                 </td>
             </tr>
             <tr>
-                <th>
+                <td>
                     <label for="prefix">
                         <?php _e('Check prefix', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" id="prefix" name="prefix"
                         <?php echo true === $data['prefix'] ? 'checked' : ''; ?>>
@@ -59,11 +58,11 @@
                 </td>
             </tr>
             <tr>
-                <th>
+                <td>
                     <label for="clean">
                         <?php _e('Clean database', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" id="clean" name="clean"
                         <?php echo true === $data['clean'] ? 'checked' : ''; ?>>
@@ -76,11 +75,11 @@
                 </td>
             </tr>
             <tr>
-                <th>
+                <td>
                     <label for="notify">
                         <?php _e('Notification to admin', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" id="notify" name="notify"
                         <?php echo true === $data['notify'] ? 'checked' : ''; ?>>
@@ -90,17 +89,16 @@
                             $data['key']); ?></p>
                 </td>
             </tr>
-            <tr>
-                <th>
+            <tr style="display: <?php echo true !== $data['gzip_status'] ? 'none' : 'table-row'; ?>">
+                <td>
                     <label for="gzip">
                         <?php _e('Enable GZip compression', $data['key']); ?>
                     </label>
 
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" name="gzip" id="gzip"
-                        <?php echo true === $data['gzip'] ? 'checked' : '' ?>
-                        <?php echo true !== $data['gzip_status'] ? 'disabled' : ''; ?>>
+                        <?php echo true === $data['gzip'] ? 'checked' : '' ?>>
                 </td>
                 <td>
                     <p class="description">
@@ -108,16 +106,15 @@
                     </p>
                 </td>
             </tr>
-            <tr>
-                <th>
+            <tr style="display: <?php echo true !== $data['utf8_status'] ? 'none' : 'table-row'; ?>">
+                <td>
                     <label for="utf8">
                         <?php _e('Enable converting to UTF-8', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" name="utf8" id="utf8"
-                        <?php echo true === $data['utf8'] ? 'checked' : ''; ?>
-                        <?php echo true !== $data['utf8_status'] ? 'disabled' : ''; ?>>
+                        <?php echo true === $data['utf8'] ? 'checked' : ''; ?>>
                 </td>
                 <td>
                     <p class="description">
@@ -127,31 +124,33 @@
                 </td>
             </tr>
             <tr>
-                <th>
-                    <label for="cron_auto">
+                <td>
+                    <label for="cron">
                         <?php _e('Enable auto backups', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
-                    <input type="checkbox" name="cron_auto" id="utf8"
-                        <?php echo true === $data['cron_auto'] ? 'checked' : ''; ?>>
+                    <input type="checkbox" name="cron" id="cron"
+                        <?php echo true === $data['cron'] ? 'checked' : ''; ?>>
                 </td>
                 <td>
                 </td>
             </tr>
-            <tr data-container="cron_auto" style="display: none;">
-                <th>
-                    <label for="cron">
-                    <?php _e('Enable auto backups', $data['key']); ?>
-                    </label>
-                </th>
+            <tbody data-container="cron" style="display: none;">
+            <tr>
                 <td>
-                    <select name="cron" id="cron">
-                        <option value="" <?php echo null === $data['cron_option'] ? 'selected' : ''; ?>>
+                    <label for="cron_frequency">
+                        <?php _e('Auto backups frequency', $data['key']); ?>
+                    </label>
+                </td>
+                <td>
+                    <select name="cron_option" id="cron_frequency">
+                        <option value="" <?php echo null === $data['cron_frequency'] ? 'selected' : ''; ?>>
                             <?php _e('Disabled', $data['key']); ?>
                         </option>
+
                         <?php foreach ($data['schedules'] as $cron => $value): ?>
-                            <option value="<?php echo $cron; ?>" <?php echo ($data['cron_option'] === $cron) ? 'selected' : ''; ?>>
+                            <option value="<?php echo $cron; ?>" <?php echo ($data['cron_frequency'] === $cron) ? 'selected' : ''; ?>>
                                 <?php echo $value['display'] ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -159,12 +158,13 @@
                 <td>
                 </td>
             </tr>
+            </tbody>
             <tr>
-                <th>
+                <td>
                     <label for="delete">
-                    <?php _e('Enable auto delete', $data['key']); ?>
+                        <?php _e('Enable auto delete', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" id="delete" name="delete"
                         <?php echo true === $data['delete'] ? 'checked' : ''; ?>>
@@ -175,12 +175,13 @@
                     </p>
                 </td>
             </tr>
-            <tr data-container="delete">
-                <th>
+            <tbody data-container="delete" style="display: none">
+            <tr>
+                <td>
                     <label for="delete_days">
-                    <?php _e('Delete after * days', $data['key']); ?>
+                        <?php _e('Delete after * days', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="number" id="delete_days" name="delete_days"
                            value="<?php echo $data['delete_days'] ?>" min="0" max="1000">
@@ -192,12 +193,12 @@
                     </p>
                 </td>
             </tr>
-            <tr data-container="delete">
-                <th>
+            <tr>
+                <td>
                     <label for="delete_copies">
-                    <?php _e('Delete after * copies', $data['key']); ?>
+                        <?php _e('Delete after * copies', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="number" id="delete_copies" name="delete_copies"
                            value="<?php echo $data['delete_copies'] ?>"
@@ -210,16 +211,17 @@
                     </p>
                 </td>
             </tr>
+            </tbody>
             <tr>
-                <th>
+                <td>
                     <label for="amazon_s3">
-                    <?php _e('Use Amazon S3 to store copies', $data['key']); ?>
+                        <?php _e('Use Amazon S3 to store copies', $data['key']); ?>
                     </label>
-                </th>
+                </td>
                 <td>
                     <input type="checkbox" name="amazon_s3"
                            id="amazon_s3"
-                           <?php echo true === $data['amazon_s3'] ? 'checked' : ''; ?>>
+                        <?php echo true === $data['amazon_s3'] ? 'checked' : ''; ?>>
                 </td>
                 <td>
                     <p class="description">
@@ -227,57 +229,60 @@
                             $data['key']); ?>
                     </p>
                 </td>
-            <tr data-container="amazon_s3" style="display: none;">
+            </tr>
+            <tbody data-container="amazon_s3" style="display: none;">
+            <tr>
                 <td>
                     <label for="amazon_s3_region">
-                        <?php _e('Amazon S3 Region', $data['key']);?>
+                        <?php _e('Amazon S3 Region', $data['key']); ?>
                     </label>
                 </td>
                 <td>
                     <input type="text" id="amazon_s3_region" name="amazon_s3_region"
-                    value="<?php echo $data['amazon_s3_region'];?>">
+                           value="<?php echo $data['amazon_s3_region']; ?>">
                 </td>
                 <td>
-                    <?php _e('Region of your bucket', $data['key']);?>
+                    <?php _e('Region of your bucket', $data['key']); ?>
                 </td>
             </tr>
-            <tr data-container="amazon_s3" style="display: none;">
+            <tr>
                 <td>
                     <label for="amazon_s3_bucket">
-                        <?php _e('Amazon S3 Bucket', $data['key']);?>
+                        <?php _e('Amazon S3 Bucket', $data['key']); ?>
                     </label>
                 </td>
                 <td>
                     <input type="text" id="amazon_s3_bucket" name="amazon_s3_bucket"
-                           value="<?php echo $data['amazon_s3_bucket'];?>">
+                           value="<?php echo $data['amazon_s3_bucket']; ?>">
                 </td>
                 <td>
-                    <?php _e('Region of your bucket', $data['key']);?>
+                    <?php _e('Region of your bucket', $data['key']); ?>
                 </td>
             </tr>
-            <tr data-container="amazon_s3" style="display: none;">
+            <tr>
                 <td>
                     <label for="amazon_s3_key">
-                        <?php _e('Amazon S3 Key', $data['key']);?>
+                        <?php _e('Amazon S3 Key', $data['key']); ?>
                     </label>
                 </td>
                 <td>
                     <input type="text" id="amazon_s3_key" name="amazon_s3_key"
-                           value="<?php echo $data['amazon_s3_key'];?>">
+                           value="<?php echo $data['amazon_s3_key']; ?>">
                 </td>
                 <td>
-                    <?php _e('Your can create your access keys in <a href="https://console.aws.amazon.com/iam/home?#/security_credential" target="_blank">Amazon S3 Console</a>.', $data['key']);?>
+                    <?php _e('Your can create your access keys in <a href="https://console.aws.amazon.com/iam/home?#/security_credential" target="_blank">Amazon S3 Console</a>.',
+                        $data['key']); ?>
                 </td>
             </tr>
-            <tr data-container="amazon_s3" style="display: none;">
+            <tr>
                 <td>
                     <label for="amazon_s3_secret">
-                        <?php _e('Amazon S3 Secret Key', $data['key']);?>
+                        <?php _e('Amazon S3 Secret Key', $data['key']); ?>
                     </label>
                 </td>
                 <td>
                     <input type="text" id="amazon_s3_secret" name="amazon_s3_secret"
-                           value="<?php echo $data['amazon_s3_secret'];?>">
+                           value="<?php echo $data['amazon_s3_secret']; ?>">
                 </td>
                 <td>
                 </td>
@@ -348,7 +353,7 @@
             </tfoot>
         </table>
         <div class="footer-buttons">
-            <button class="button button-primary">
+            <button class="button button-primary" data-action="create">
                 <?php _e('Create backup now', $data['key']); ?>
             </button>
         </div>
@@ -360,24 +365,4 @@
         admin_url: '<?php echo $data['admin_url']; ?>',
         nonce: '<?php echo $data['nonce'];?>'
     };
-
-    jQuery('.settings-toggle').click(function () {
-        var s = jQuery('.settings-wrap');
-
-        if (s.css('display') === 'block')
-            s.fadeOut();
-        else
-            s.fadeIn(200);
-    });
-
-    jQuery('.auto-delete-checkbox').click(function () {
-        var c = jQuery(this);
-        var a = jQuery('.auto-delete');
-
-        if (c.attr('checked')) {
-            a.fadeIn(200);
-        } else {
-            a.fadeOut(200);
-        }
-    });
 </script>

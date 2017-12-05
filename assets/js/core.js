@@ -2,67 +2,139 @@
  * global document, $
  */
 class App {
-  /**
-   *
-   */
-  constructor() {
-    this.key = window.DatabaseBackups.key;
-    this.url = window.DatabaseBackups.admin_url;
-    this.nonce = window.DatabaseBackups.nonce;
+    /**
+     *
+     */
+    constructor() {
+        this.key = window.DatabaseBackups.key;
+        this.url = window.DatabaseBackups.admin_url;
+        this.nonce = window.DatabaseBackups.nonce;
 
-    this.container = $('.database-backups');
-    this.
-    //  try {
-    this.init();
-    // } catch (e) {
-    //    console.log('Error:' + e);
-    //   }
-  }
+        this.container = jQuery('.database-backups');
 
-  /**
-   * @param selector
-   * @return object
-   */
-  getElement(selector) {
-    return this.container.find(selector);
-  }
+        //  try {
+        this.init();
+        // } catch (e) {
+        //    console.log('Error:' + e);
+        //   }
+    }
 
-  /**
-   * @return App
-   */
-  init() {
-    this.bindCreate();
-    return this;
-  }
+    /**
+     * @param selector
+     * @return object
+     */
+    getElement(selector) {
+        return this.container.find(selector);
+    }
 
-  /**
-   * @return App
-   */
-  bindCreate() {
-    let createButton = this.getElement('button.create');
-      createButton.click( () =>  {
-        this.createBackupCall();
-    });
-    return this;
-  }
+    /**
+     * @return App
+     */
+    init() {
+        this.bindCreate().bindOptions().bindCronOption().bindDeleteOption().bindAmazonS3Option();
 
-  createBackupCall() {
-      $.ajax({
-          type: 'POST',
-          url: admin_url,
-          data: {
-            'action': 'database-backups_create',
-            'do_backup': true,
-          },
-          success: function(data){
+        return this;
+    }
 
-          }
-      });
-  }
+    /**
+     * @return App
+     */
+    bindCreate() {
+        let createButton = this.getElement('button[data-action=create]');
+        createButton.click(() => {
+            this.createBackupCall();
+        });
+        return this;
+    }
+
+    bindOptions() {
+        let button = this.getElement('button[data-action=options-toggle]'),
+            container = this.getElement('[data-container=options]');
+
+        button.click(() => {
+            container.toggle('slow');
+        });
+
+        return this;
+    }
+
+    bindCronOption() {
+        let button = this.getElement('input#cron'),
+            container = this.getElement('[data-container=cron]');
+
+        let check = () => {
+            if (button.attr('checked')) {
+                container.fadeIn('slow');
+            }
+            else {
+                container.fadeOut('slow');
+            }
+        };
+
+        button.click(() => {
+            check()
+        });
+
+        return this;
+    }
+
+    bindDeleteOption() {
+        let button = this.getElement('input#delete'),
+            container = this.getElement('[data-container=delete]');
+
+        let check = () => {
+            if (button.attr('checked')) {
+                container.fadeIn('slow');
+            }
+            else {
+                container.fadeOut('slow');
+            }
+        };
+
+        button.click(() => {
+            check()
+        });
+
+        return this;
+    }
+
+    bindAmazonS3Option() {
+        let button = this.getElement('input#amazon_s3'),
+            container = this.getElement('[data-container=amazon_s3]');
+
+        let check = () => {
+            if (button.attr('checked')) {
+                container.fadeIn('slow');
+            }
+            else {
+                container.fadeOut('slow');
+            }
+        };
+
+        button.click(() => {
+            check()
+        });
+
+        return this;
+    }
+
+    createBackupCall() {
+        jQuery.ajax({
+            type: 'POST',
+            url: this.url,
+            data: {
+                action: 'database-backups_create',
+                nonce: this.nonce,
+            },
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    }
 }
 
-(function($) {
-  $(document).ready(() => {
-    new App();
-  });
+(function ($) {
+    $(document).ready(() => {
+        new App();
+    });
 }(jQuery));
