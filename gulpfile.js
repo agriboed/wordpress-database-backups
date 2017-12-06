@@ -1,4 +1,5 @@
 const gulp = require('gulp');
+const watch = require('gulp-watch');
 const imagemin = require('gulp-imagemin');
 const sass = require('gulp-sass');
 const clean = require('gulp-clean-css');
@@ -22,7 +23,7 @@ gulp.task('default', () => {
       .pipe(babel({
         presets: ['env'],
       }))
-     // .pipe(concat('app.js'))
+      .pipe(concat('core.js'))
       .pipe(uglify())
       .pipe(sourcemaps.write())
       .pipe(gulp.dest('./database-backups/assets/js'));
@@ -30,4 +31,8 @@ gulp.task('default', () => {
   gulp.src('./assets/image/**/*')
       .pipe(imagemin())
       .pipe(gulp.dest('./database-backups/assets/image'));
+});
+
+gulp.task('watch',function(){
+    gulp.watch(['./assets/js/*.js', '!./assets/js/vendor/**/*.js'], ['default']);
 });

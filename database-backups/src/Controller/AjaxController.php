@@ -3,9 +3,10 @@
 namespace DatabaseBackups\Controller;
 
 use DatabaseBackups\Core\AbstractController;
-use DatabaseBackups\Service\BackupService;
 use DatabaseBackups\Service\OptionsService;
+use DatabaseBackups\Service\BackupService;
 use DatabaseBackups\Core\Container;
+use DatabaseBackups\Service\S3Service;
 
 /**
  * Class AjaxController
@@ -26,7 +27,6 @@ class AjaxController extends AbstractController
         add_action('wp_ajax_' . Container::key() . '_options', [$this, 'saveOptions']);
         add_action('wp_ajax_' . Container::key() . '_create', [$this, 'createBackup']);
         add_action('wp_ajax_' . Container::key() . '_deletes', [$this, 'deleteBackup']);
-        add_action('wp_ajax_' . Container::key() . '_amazon_s3', [$this, 'checkAmazonS3']);
     }
 
     /**
@@ -45,8 +45,8 @@ class AjaxController extends AbstractController
      */
     public function saveOptions()
     {
-        if (!isset($_POST['options']) || !is_array($_POST['options'])) {
-            return $this->response();
+        if (empty($_POST['options']) || !is_array($_POST['options'])) {
+            return $this->response(false, __('Nothing to save', Container::key()));
         }
 
         /**
@@ -55,7 +55,18 @@ class AjaxController extends AbstractController
         $optionsService = $this->container->get(OptionsService::class);
         $optionsService->setOptions($_POST['options']);
 
-        return $this->response(true);
+        if (!empty($_POST['amazon_s3']) && 'true' === $_POST['amazon_s3']) {
+            /**
+             * @var $s3Service S3Service
+             */
+            $s3Service = $this->container->get(S3Service::class);
+
+            return $s3Service->isConnected() ?
+                $this->response(true, __('Options saved. Amazon S3 connection is successful.', Container::key())) :
+                $this->response(false, __('Options saved. Amazon S3 connection failed', Container::key()));
+        }
+
+        return $this->response(true, __('Options saved', Container::key()));
     }
 
     /**
@@ -94,14 +105,6 @@ class AjaxController extends AbstractController
         $backupService = $this->container->get(BackupService::class);
         $backupService->deleteBackup($_POST['delete']);
 
-        return $this->response(true);
-    }
-
-    /**
-     *
-     */
-    public function checkAmazonS3()
-    {
         return $this->response(true);
     }
 

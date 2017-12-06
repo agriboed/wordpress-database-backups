@@ -1,11 +1,16 @@
 <div class="database-backups wrap">
+    <div style="display:none;" data-container="message"></div>
+
     <h1><?php _e('Database Backups', $data['key']); ?></h1>
     <h2>
-        <button class="button button-controls" data-action="options-toggle">
+        <button class="button button-controls"
+                data-action="toggle"
+                data-param-container="options"
+                data-param-show="<?php echo empty($data['directory']) ? 'true' : 'false'; ?>">
             <?php _e('Settings', $data['key']); ?>
         </button>
     </h2>
-    <form class="options-wrap" data-container="options" style="display: none;">
+    <form class="options-wrap" data-container="options" style="display: none;" data-element="optionsForm">
         <table class="form-table">
             <tr>
                 <td>
@@ -15,7 +20,7 @@
                 </td>
                 <td>
                     <?php echo $data['wp_upload_dir']['baseurl']; ?>/
-                    <input type="text" id="directory" name="directory"
+                    <input type="text" id="directory" name="directory" class="input-form"
                            placeholder="<?php echo $data['directory']; ?>"
                            value="<?php echo $data['directory']; ?>" required>
                 </td>
@@ -29,7 +34,7 @@
                     </label>
                 </td>
                 <td>
-                    <input type="number" id="limit" min="0" max="1000" name="limit"
+                    <input type="number" id="limit" min="0" max="1000" name="limit" class="input-form"
                            placeholder="<?php echo $data['limit']; ?>"
                            value="<?php echo $data['limit']; ?>">
                 </td>
@@ -131,6 +136,9 @@
                 </td>
                 <td>
                     <input type="checkbox" name="cron" id="cron"
+                           data-action="toggle"
+                           data-param-container="cron"
+                           data-param-show="<?php echo true === $data['cron'] ? 'true' : 'false'; ?>"
                         <?php echo true === $data['cron'] ? 'checked' : ''; ?>>
                 </td>
                 <td>
@@ -144,11 +152,7 @@
                     </label>
                 </td>
                 <td>
-                    <select name="cron_option" id="cron_frequency">
-                        <option value="" <?php echo null === $data['cron_frequency'] ? 'selected' : ''; ?>>
-                            <?php _e('Disabled', $data['key']); ?>
-                        </option>
-
+                    <select name="cron_frequency" id="cron_frequency" class="input-form">
                         <?php foreach ($data['schedules'] as $cron => $value): ?>
                             <option value="<?php echo $cron; ?>" <?php echo ($data['cron_frequency'] === $cron) ? 'selected' : ''; ?>>
                                 <?php echo $value['display'] ?></option>
@@ -167,6 +171,9 @@
                 </td>
                 <td>
                     <input type="checkbox" id="delete" name="delete"
+                           data-action="toggle"
+                           data-param-container="delete"
+                           data-param-show="<?php echo true === $data['delete'] ? 'true' : 'false'; ?>"
                         <?php echo true === $data['delete'] ? 'checked' : ''; ?>>
                 </td>
                 <td>
@@ -183,7 +190,7 @@
                     </label>
                 </td>
                 <td>
-                    <input type="number" id="delete_days" name="delete_days"
+                    <input type="number" id="delete_days" name="delete_days" class="input-form"
                            value="<?php echo $data['delete_days'] ?>" min="0" max="1000">
                 </td>
                 <td>
@@ -200,7 +207,7 @@
                     </label>
                 </td>
                 <td>
-                    <input type="number" id="delete_copies" name="delete_copies"
+                    <input type="number" id="delete_copies" name="delete_copies" class="input-form"
                            value="<?php echo $data['delete_copies'] ?>"
                            min="0" max="1000">
                 </td>
@@ -215,17 +222,20 @@
             <tr>
                 <td>
                     <label for="amazon_s3">
-                        <?php _e('Use Amazon S3 to store copies', $data['key']); ?>
+                        <?php _e('Use Amazon S3', $data['key']); ?>
                     </label>
                 </td>
                 <td>
                     <input type="checkbox" name="amazon_s3"
                            id="amazon_s3"
+                           data-action="toggle"
+                           data-param-container="amazon_s3"
+                           data-param-show="<?php echo true === $data['amazon_s3'] ? 'true' : 'false'; ?>"
                         <?php echo true === $data['amazon_s3'] ? 'checked' : ''; ?>>
                 </td>
                 <td>
                     <p class="description">
-                        <?php _e('Use Amazon s3 to manage copies of your backups as well',
+                        <?php _e('Use Amazon s3 to manage your backups as well',
                             $data['key']); ?>
                     </p>
                 </td>
@@ -238,11 +248,13 @@
                     </label>
                 </td>
                 <td>
-                    <input type="text" id="amazon_s3_region" name="amazon_s3_region"
+                    <input type="text" id="amazon_s3_region" name="amazon_s3_region" class="input-form"
                            value="<?php echo $data['amazon_s3_region']; ?>">
                 </td>
                 <td>
-                    <?php _e('Region of your bucket', $data['key']); ?>
+                    <p class="description">
+                        <?php _e('Region of your bucket', $data['key']); ?>
+                    </p>
                 </td>
             </tr>
             <tr>
@@ -252,11 +264,13 @@
                     </label>
                 </td>
                 <td>
-                    <input type="text" id="amazon_s3_bucket" name="amazon_s3_bucket"
+                    <input type="text" id="amazon_s3_bucket" name="amazon_s3_bucket" class="input-form"
                            value="<?php echo $data['amazon_s3_bucket']; ?>">
                 </td>
                 <td>
-                    <?php _e('Region of your bucket', $data['key']); ?>
+                    <p class="description">
+                        <?php _e('Name of your bucket', $data['key']); ?>
+                    </p>
                 </td>
             </tr>
             <tr>
@@ -266,12 +280,14 @@
                     </label>
                 </td>
                 <td>
-                    <input type="text" id="amazon_s3_key" name="amazon_s3_key"
+                    <input type="text" id="amazon_s3_key" name="amazon_s3_key" class="input-form"
                            value="<?php echo $data['amazon_s3_key']; ?>">
                 </td>
                 <td>
-                    <?php _e('Your can create your access keys in <a href="https://console.aws.amazon.com/iam/home?#/security_credential" target="_blank">Amazon S3 Console</a>.',
-                        $data['key']); ?>
+                    <p class="description">
+                        <?php _e('Your can create your access keys in <a href="https://console.aws.amazon.com/iam/home?#/security_credential" target="_blank">Amazon S3 Console</a>.',
+                            $data['key']); ?>
+                    </p>
                 </td>
             </tr>
             <tr>
@@ -281,16 +297,21 @@
                     </label>
                 </td>
                 <td>
-                    <input type="text" id="amazon_s3_secret" name="amazon_s3_secret"
+                    <input type="password" style="display: none">
+                    <input type="password" id="amazon_s3_secret" name="amazon_s3_secret" class="input-form"
                            value="<?php echo $data['amazon_s3_secret']; ?>">
                 </td>
                 <td>
+                    <button type="button" data-action="saveOptions" data-param="checkAmazonS3"
+                            class="button button-primary">
+                        <?php _e('Save changes and check', $data['key']); ?>
+                    </button>
                 </td>
             </tr>
             </tbody>
         </table>
 
-        <button type="button" class="button button-primary" data-action="save-settings">
+        <button type="button" class="button button-primary" data-action="saveOptions">
             <?php _e('Save settings'); ?>
         </button>
     </form>
@@ -353,16 +374,18 @@
             </tfoot>
         </table>
         <div class="footer-buttons">
-            <button class="button button-primary" data-action="create">
+            <button class="button button-primary" data-action="createBackup">
                 <?php _e('Create backup now', $data['key']); ?>
             </button>
         </div>
     </div>
 </div>
 <script>
-    var DatabaseBackups = {
-        key: '<?php echo $data['key'];?>',
-        admin_url: '<?php echo $data['admin_url']; ?>',
-        nonce: '<?php echo $data['nonce'];?>'
-    };
+    jQuery(document).ready(function () {
+        new DatabaseBackups({
+            key: '<?php echo $data['key'];?>',
+            admin_url: '<?php echo $data['admin_url']; ?>',
+            nonce: '<?php echo $data['nonce'];?>'
+        });
+    });
 </script>

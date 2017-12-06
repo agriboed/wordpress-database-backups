@@ -55,7 +55,7 @@ class OptionsService extends AbstractService
         $this->setOption('utf8', isset($options['utf8']) ? true : false);
         $this->setOption('cron', isset($options['cron']) ? true : false);
         $this->setOption('cron_frequency',
-            isset($options['cron_frequency']) ? _sanitize_text_fields($options['cron_frequency']) : 0);
+            !empty($options['cron_frequency']) ? _sanitize_text_fields($options['cron_frequency']) : null);
         $this->setOption('delete', isset($options['delete']) ? true : false);
         $this->setOption('delete_days', isset($options['delete_days']) ? (int)$options['delete_days'] : 0);
         $this->setOption('delete_copies', isset($options['delete_copies']) ? (int)$options['delete_copies'] : 0);
@@ -69,16 +69,23 @@ class OptionsService extends AbstractService
         $this->setOption('amazon_s3_secret',
             isset($options['amazon_s3_secret']) ? _sanitize_text_fields($options['amazon_s3_secret']) : null);
 
-        if (self::getOption('delete_copies') === 0 && self::getOption('delete_days') === 0) {
+        $this->validateOptions();
+    }
+
+    /**
+     *
+     */
+    public function validateOptions()
+    {
+        if (static::getOption('delete_copies') === 0 && static::getOption('delete_days') === 0) {
             $this->setOption('delete', 0);
         }
 
-        if (isset($options['cron']) && $options['cron'] !== self::getOption('cron')) {
-            /**
-             * @var $cronService CronService
-             */
-            $cronService = $this->container->get(CronService::class);
-            $cronService->clearSchedule();
+        if (empty(static::getOption('amazon_s3_bucket')) ||
+            empty(static::getOption('amazon_s3_key')) ||
+            empty(static::getOption('amazon_s3_secret'))
+        ) {
+            $this->setOption('amazon_s3', false);
         }
     }
 }

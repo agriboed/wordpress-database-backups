@@ -1,6 +1,51 @@
 .database-backups {
+
+  [data-container=message] {
+    position: fixed;
+    padding: 30px 15px;
+    text-align: center;
+    width: 400px;
+    background: #fff;
+    border-radius: 2px;
+    border: 2px solid #ccc;
+    font-size: 16px;
+  }
+
+  [data-container=message].success {
+    border: 2px solid #46a53c;
+  }
+
+  [data-container=message].error {
+    border: 2px solid #c14949
+  }
+
   .options-wrap {
     display: none;
+  }
+
+  .input-form {
+    padding: 8px 15px;
+    border-radius: 3px;
+  }
+
+  .input-form[type=text],
+  .input-form[type=password],
+  select.input-form {
+    min-width: 300px;
+  }
+
+  select.input-form {
+    height: 35px;
+  }
+
+  .form-table {
+    border: 1px solid #ccc;
+    background: #fff;
+    margin-bottom: 10px;
+  }
+
+  .form-table:nth-child(2) {
+    background: #f2f2f2;
   }
 
   .options-toggle {
