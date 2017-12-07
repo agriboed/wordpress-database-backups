@@ -1,7 +1,7 @@
 === Database Backups ===
 Contributors: AGriboed
 Donate link: http://v1rus.ru
-Tags: backup, database, backup database,back up, backups, data base, database, database backup, db backup, dump, file, file backup, full backup, page backup, recover, recovery, restore, schedule, schedule backup, scheduled backup, schema, schema backup, site, site backup, web backup, web page, web page backup, WooCommerce backup
+Tags: backup, database, backup database, back up, backups, data base, database, database backup, db backup, dump, file, file backup, full backup, page backup, recover, recovery, restore, schedule, schedule backup, scheduled backup, schema, schema backup, site, site backup, web backup, web page, web page backup, WooCommerce backup
 Requires at least: 4
 Tested up to: 4.5.3
 Stable tag: 1.2.2.6
@@ -13,7 +13,8 @@ Simple Plugin that allows do backup of database tables. Manually or auto.
 == Description ==
 Simple plugin that allows to do backups of your database tables. Do it manually or use auto mode. 
 
-* enable option what allow to delete the old copies without your participation.
+
+* enable option what allow to delete the old copies without your participation
 * use backups compression to take less space
 * use limits of queries to DB to reduce the load on the server
 * save only wordpress tables or all tables
@@ -23,18 +24,6 @@ Simple plugin that allows to do backups of your database tables. Do it manually 
 
 Backups of database - do it simple!
 
-
-Простой плагин, который позволит вам настроить бэкапы вашей базы в атоматическом либо ручном режиме.
-
-* включите опцию удаления старых копий без вашего участия
-* ипользуйте опцию компрессии файлов, чтобы сэкономить место
-* используйте лимиты запросов к БД, чтобы снизить нагрузку на сервер
-* сохраняйте только таблицы Wordpress или все таблицы в БД
-* сохраняйте только чистую базу, без "мусора"
-* получайте информацию о результате резервного копирования на email
-* настройте плагин за 5 минут и доверьте ему сохранность вашей информации
-
-Бэкапы базы данных - это просто!
 
 Support and suggestions, [Support](http://v1rus.ru/database-backups-wordpress/)
 skype: agriboed

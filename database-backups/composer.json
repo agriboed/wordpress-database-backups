@@ -6,7 +6,9 @@
             "email": "alexv1rs@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "aws/aws-sdk-php": "^3.44"
+    },
     "autoload": {
         "psr-4": { "DatabaseBackups\\": ["src/"] }
     }

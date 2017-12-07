@@ -1,1 +1,5 @@
 .idea/
+node_modules/
+database-backups/assets/css/
+database-backups/assets/js/
+database-backups/assets/images

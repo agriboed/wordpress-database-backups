@@ -1,4 +1,5 @@
 <?php
+
 namespace DatabaseBackups\Interfaces;
 
 use DatabaseBackups\Core\Container;
