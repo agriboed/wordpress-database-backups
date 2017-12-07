@@ -1,15 +1,36 @@
 <div class="database-backups wrap">
-    <div style="display:none;" data-container="message"></div>
+    <div style="display:none;" data-element="message"></div>
+    <div style="display: none" data-element="loader">
+        <div class="wBall" id="wBall_1">
+            <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_2">
+            <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_3">
+            <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_4">
+            <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_5">
+            <div class="wInnerBall"></div>
+        </div>
+    </div>
 
     <h1><?php _e('Database Backups', $data['key']); ?></h1>
-    <h2>
+
+    <div class="header-buttons">
         <button class="button button-controls"
                 data-action="toggle"
                 data-param-container="options"
                 data-param-show="<?php echo empty($data['directory']) ? 'true' : 'false'; ?>">
             <?php _e('Settings', $data['key']); ?>
         </button>
-    </h2>
+        <button class="button button-primary" data-action="createBackup">
+            <?php _e('Create backup now', $data['key']); ?>
+        </button>
+    </div>
     <form class="options-wrap" data-container="options" style="display: none;" data-element="optionsForm">
         <table class="form-table">
             <tr>
@@ -253,7 +274,10 @@
                 </td>
                 <td>
                     <p class="description">
-                        <?php _e('Region of your bucket', $data['key']); ?>
+                        <?php _e('<a href="http://docs.aws.amazon.com/general/latest/gr/rande.html#apigateway_region" target=_blank>Region</a> of your bucket.',
+                            $data['key']); ?>
+                        <?php _e('Put there code of region of your bucket, for example Canada (Central) it\'s <strong>ca-central-1</strong>',
+                            $data['key']); ?>
                     </p>
                 </td>
             </tr>
@@ -330,20 +354,19 @@
             </tr>
             </thead>
             <tbody>
-            <?php if (count($data['backups']) === 0): ?>
-                <tr class="no-backups-yet">
-                    <td colspan="5">
-                        <?php _e('No backups yet. Create a new one right now.', $data['key']); ?>
-                    </td>
-                </tr>
-            <?php endif; ?>
+            <tr class="no-backups-yet"
+                style="display:<?php echo (count($data['backups']) === 0) ? 'table-row' : 'none'; ?>" data-element="noBackups">
+                <td colspan="5">
+                    <?php _e('No backups yet. Create a <a href=# data-action="createBackup">new one</a> right now.', $data['key']); ?>
+                </td>
+            </tr>
             <?php foreach ($data['backups'] as $backup): ?>
                 <tr>
                     <td>
                         <?php echo $data['i']++; ?>
                     </td>
                     <td>
-                        <span class="icon dashicons <?php echo $backup['format'] === 'sql' ? 'dashicons-media-spreadsheet' : 'dashicons-portfolio'; ?>"></span>
+                        <span class="icon dashicons <?php echo $backup['icon']; ?>"></span>
                         <?php echo $backup['name']; ?>
                     </td>
                     <td>
@@ -356,7 +379,8 @@
                         <a href="<?php echo $backup['url']; ?>" class="button button-cancel">
                             <span class="icon dashicons dashicons-download"></span> <?php _e('Download',
                                 $data['key']); ?></a>
-                        <button data-action="deleteBackup" data-param="<?php echo $backup['name']; ?>" class="button button-cancel">
+                        <button data-action="deleteBackup" data-param="<?php echo $backup['name']; ?>"
+                                class="button button-cancel">
                             <span class="icon dashicons dashicons-trash"></span> <?php _e('Delete', $data['key']); ?>
                         </button>
                     </td>

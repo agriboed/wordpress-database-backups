@@ -32,7 +32,7 @@ class AdminController extends AbstractController
      */
     public function registerAssets()
     {
-        wp_register_script(Container::key() . '-admin', Container::pluginUrl() . 'assets/js/core.js');
+        wp_register_script(Container::key() . '-admin', Container::pluginUrl() . 'assets/js/app.js');
         wp_register_style(Container::key() . '-admin', Container::pluginUrl() . 'assets/css/admin.css');
     }
 
@@ -74,6 +74,7 @@ class AdminController extends AbstractController
          * @var $backupService BackupService
          */
         $backupService = $this->container->get(BackupService::class);
+        $backupService->checkOldCopies();
 
         /**
          * @var $backupModel BackupModel
@@ -108,7 +109,7 @@ class AdminController extends AbstractController
             'amazon_s3_bucket' => OptionsService::getOption('amazon_s3_bucket'),
             'amazon_s3_key' => OptionsService::getOption('amazon_s3_key'),
             'amazon_s3_secret' => OptionsService::getOption('amazon_s3_secret'),
-            'i' => 0,
+            'i' => 1,
             'nonce' => wp_create_nonce(Container::key()),
             'admin_url' => admin_url('admin-ajax.php')
         ];

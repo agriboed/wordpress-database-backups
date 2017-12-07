@@ -12,7 +12,6 @@ class App {
         this.nonce = options.nonce;
         this.apiAction = 'database-backups_';
         this.container = jQuery('.database-backups');
-
         this.Events = new Events(this);
         this.Actions = new Actions(this);
     }
@@ -31,9 +30,13 @@ class App {
      * @param success
      */
     showMessage(message, success = true) {
-        let el = this.getElement('[data-container=message]');
+        let el = this.getElement('[data-element=message]');
 
-        el.html('').removeClass('success error');
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+
+        el.hide().html('').removeClass('success error');
 
         if (true === success) {
             el.addClass('success')
@@ -44,9 +47,25 @@ class App {
 
         el.html(message).fadeIn('normal');
 
-        setTimeout(() => {
+        let timeout = setTimeout(() => {
             el.fadeOut('normal');
         }, 5000);
+    }
+
+    /**
+     *
+     */
+    showLoader() {
+        let el = this.getElement('[data-element=loader]');
+        el.fadeIn('normal');
+    }
+
+    /**
+     *
+     */
+    hideLoader() {
+        let el = this.getElement('[data-element=loader]');
+        el.fadeOut('normal');
     }
 }
 

@@ -2,6 +2,7 @@
 
 namespace DatabaseBackups\Service;
 
+use Aws\Exception\AwsException;
 use DatabaseBackups\Core\AbstractService;
 use DatabaseBackups\Exceptions\Exception;
 use Aws\S3\Exception\S3Exception;
@@ -15,9 +16,14 @@ class S3Service extends AbstractService
     protected $client;
 
     /**
-     * @var
+     * @var string
      */
     protected $bucket;
+
+    /**
+     * @var string
+     */
+    protected $region;
 
     /**
      * S3Service constructor.
@@ -38,28 +44,20 @@ class S3Service extends AbstractService
                 'credentials' => [
                     'key' => OptionsService::getOption('amazon_s3_key'),
                     'secret' => OptionsService::getOption('amazon_s3_secret'),
-                ]
+                ],
             ]);
 
-            //try to check connection
-            $result = $this->client->listBuckets();
-            $bucketIsset = false;
-
-            if (is_array($result['Buckets'])) {
-                foreach ($result['Buckets'] as $bucket) {
-                    if ($bucket['Name'] === $this->bucket) {
-                        $bucketIsset = true;
-                    }
-                }
-            }
-
-            if (false === $bucketIsset) {
-                $this->client = null;
-            }
-
+            //check region
+            $this->client->listObjects([
+                'Bucket' => $this->bucket,
+            ]);
         } catch (Exception $exception) {
-            $this->client = null;
+
+            echo $exception->getMessage();
+        } catch (AwsException $exception) {
+            echo $exception->getMessage();
         }
+
     }
 
     /**
@@ -85,9 +83,35 @@ class S3Service extends AbstractService
         }
 
         return $this->client->getObject(array(
+            'Region' => $this->region,
             'Bucket' => $this->bucket,
             'Key' => $key
         ));
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    public function delete($key)
+    {
+        if (false === $this->isConnected()) {
+            return false;
+        }
+
+        try {
+            $this->client->deleteObject([
+                'Region' => $this->region,
+                'Bucket' => $this->bucket,
+                'Key' => $key,
+            ]);
+
+        } catch (S3Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -104,13 +128,14 @@ class S3Service extends AbstractService
 
         try {
             $this->client->putObject([
+                'Region' => $this->region,
                 'Bucket' => $this->bucket,
                 'Key' => $key,
-                'Body' => 'sss',
+                'Body' => $data,
                 'ACL' => 'private',
             ]);
-        } catch (S3Exception $e) {
 
+        } catch (S3Exception $e) {
             return false;
         }
 

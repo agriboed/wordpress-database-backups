@@ -201,12 +201,23 @@ class BackupService extends AbstractService
 
     /**
      *
+     * @throws \DatabaseBackups\Exceptions\Exception
      */
     protected function checkDirectory()
     {
+        $directory_name = OptionsService::getOption('directory');
+
+        if (!empty($directory_name)) {
+            $this->url = get_site_url() . '/wp-content/' . $directory_name . '/';
+            $this->directory = WP_CONTENT_DIR . '/' . $directory_name . '/';
+        } else {
+            $this->url = get_site_url() . '/wp-content/database-backups/';
+            $this->directory = WP_CONTENT_DIR . '/database-backups/';
+        }
+
         if (!is_dir($this->directory)) {
             if (!mkdir($this->directory) && !is_dir($this->directory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->directory));
+                throw new Exception('Directory "%s" was not created');
             }
         }
 
@@ -248,12 +259,10 @@ class BackupService extends AbstractService
      */
     protected function convertGzip()
     {
-        if (!function_exists('gzencode') || true !== OptionsService::getOption('gzip')) {
-            return $this;
+        if (function_exists('gzencode') || true === (bool)OptionsService::getOption('gzip')) {
+            $this->filename .= '.gz';
+            $this->sql = gzencode($this->sql, 9);
         }
-
-        $this->filename .= '.gz';
-        $this->sql = gzencode($this->sql, 9);
 
         return $this;
     }
@@ -300,13 +309,11 @@ class BackupService extends AbstractService
             return $this;
         }
 
-        $handle = fopen($this->directory . $this->filename, 'rb+');
-
         /**
          * @var $s3Service S3Service
          */
         $s3Service = $this->container->get(S3Service::class);
-        $s3Service->set($this->filename, $handle);
+        $s3Service->set($this->filename, $this->sql);
 
         return $this;
     }
@@ -356,7 +363,6 @@ class BackupService extends AbstractService
     protected function readBackups()
     {
         $this->backups = [];
-
         $dh = opendir($this->directory);
         $files = [];
 
@@ -378,6 +384,7 @@ class BackupService extends AbstractService
 
                     $files[] = [
                         'name' => $name,
+                        'icon' => $format === 'gz' ? 'dashicons-portfolio' : 'dashicons-media-spreadsheet',
                         'size' => filesize($file),
                         'size_mb' => round(filesize($file) / 1024 / 1024, 2),
                         'url' => $this->url . $name,
@@ -403,7 +410,9 @@ class BackupService extends AbstractService
      */
     public function getBackup($name)
     {
-        $this->readBackups();
+        $this
+            ->checkDirectory()
+            ->readBackups();
 
         foreach ($this->backups as $backup) {
             if ($backup['name'] === $name) {
@@ -422,16 +431,6 @@ class BackupService extends AbstractService
     {
         $this->backups = [];
 
-        $directory_name = OptionsService::getOption('directory');
-
-        if (!empty($directory_name)) {
-            $this->url = get_site_url() . '/wp-content/' . $directory_name . '/';
-            $this->directory = WP_CONTENT_DIR . '/' . $directory_name . '/';
-        } else {
-            $this->url = get_site_url() . '/wp-content/database-backups/';
-            $this->directory = WP_CONTENT_DIR. '/database-backups/';
-        }
-
         $this
             ->checkDirectory()
             ->readBackups();
@@ -442,6 +441,8 @@ class BackupService extends AbstractService
     /**
      * @param $filename
      * @return bool
+     * @throws \InvalidArgumentException
+     * @throws \DatabaseBackups\Exceptions\Exception
      */
     public function deleteBackup($filename)
     {
@@ -454,15 +455,60 @@ class BackupService extends AbstractService
             return false;
         }
 
+        if (true === (bool)OptionsService::getOption('amazon_s3'))
+        {
+            /**
+             * @var $s3Service S3Service
+             */
+            $s3Service = $this->container->get(S3Service::class);
+            $s3Service->delete($filename);
+        }
+
         return unlink($this->directory . $filename);
     }
 
     /**
      *
+     * @throws \DatabaseBackups\Exceptions\Exception
+     * @throws \InvalidArgumentException
      */
-    public function checkOld()
+    public function checkOldCopies()
     {
+        $days = (int)OptionsService::getOption('delete_days');
+        $copies = (int)OptionsService::getOption('delete_copies');
 
+        if ($days === 0 && $copies === 0) {
+            return $this;
+        }
+
+        $this
+            ->checkDirectory()
+            ->getBackups();
+
+        if ($copies > 0 && count($this->backups) > $copies) {
+            $i = 0;
+
+            foreach ($this->backups as $backup) {
+                $i++;
+                if ($i > $copies) {
+                    $this->deleteBackup($backup['name']);
+                }
+            }
+        }
+
+        if ($days > 0) {
+            foreach ($this->backups as $backup) {
+                $check_date = new \DateTime('-' . $days . ' ');
+                $file_date = new \DateTime();
+                $file_date->setTimestamp($backup['date']);
+                $diff = $file_date->diff($check_date);
+                if ($diff->days > $days) {
+                    $this->deleteBackup($backup['name']);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**

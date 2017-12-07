@@ -59,6 +59,8 @@ class Events {
     deleteBackup() {
         let el = this.App.getElement('[data-action=deleteBackup]');
 
+        el.unbind();
+
         el.click((e) => {
             let el = jQuery(e.target);
             let filename = el.data('param');

@@ -23,16 +23,16 @@ gulp.task('default', () => {
       .pipe(babel({
         presets: ['env'],
       }))
-      .pipe(concat('core.js'))
+      .pipe(concat('app.js'))
       .pipe(uglify())
       .pipe(sourcemaps.write())
       .pipe(gulp.dest('./database-backups/assets/js'));
 
-  gulp.src('./assets/image/**/*')
-      .pipe(imagemin())
-      .pipe(gulp.dest('./database-backups/assets/image'));
+  // gulp.src('./assets/image/**/*')
+  //     .pipe(imagemin())
+  //     .pipe(gulp.dest('./database-backups/assets/image'));
 });
 
 gulp.task('watch',function(){
-    gulp.watch(['./assets/js/*.js', '!./assets/js/vendor/**/*.js'], ['default']);
+    gulp.watch(['./assets/js/*.js', '!./assets/js/vendor/**/*.js','./assets/css/*'], ['default']);
 });

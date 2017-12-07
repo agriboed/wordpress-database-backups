@@ -33,6 +33,7 @@ class Actions {
         let data,
             formData,
             form = this.App.getElement('[data-element=optionsForm]');
+        this.App.showLoader();
 
         formData = form.serializeArray();
 
@@ -58,11 +59,15 @@ class Actions {
             dataType: 'json',
             success: (response) => {
                 this.App.showMessage(response.message, response.success);
+                this.App.hideLoader();
             },
             error: () => {
                 this.App.showMessage('Server error. Please, try again', false);
+                this.App.hideLoader();
             }
         });
+
+        return this;
     }
 
     /**
@@ -70,6 +75,7 @@ class Actions {
      */
     createBackup() {
         let data;
+        this.App.showLoader();
 
         data = {
             action: this.getApiAction('create'),
@@ -86,9 +92,11 @@ class Actions {
                 if (true === response.success) {
                     this.addBackupRow(response.backup);
                 }
+                this.App.hideLoader();
             },
             error: () => {
                 this.App.showMessage('Server error. Please, try again', false);
+                this.App.hideLoader();
             }
         });
     }
@@ -99,16 +107,23 @@ class Actions {
      */
     addBackupRow(backup) {
         let table = this.App.getElement('[data-element=backupsTable]'),
-            no_backups = table.find('tr.no-backups-yet');
+            no_backups = this.App.getElement('[data-element=noBackups]');
 
-        if (no_backups !== undefined) {
+        if (no_backups.attr('display') !== 'none') {
             no_backups.hide();
         }
 
-        table.find('tbody')
-            .append('<tr><td></td><td>' + backup.name + '</td><td>' + backup.size_mb + '</td><td>' + backup.date_i18n + '</td><td><a href="' + backup.url + '" class="button button-cancel"><span class="icon dashicons dashicons-download"></span>Download</a><button data-action="deleteBackup" data-param="' + backup.name + '" class="button button-cancel"><span class="icon dashicons dashicons-trash"></span>Delete</button></td></tr>');
+        table.find('tbody tr:first')
+            .after('<tr><td></td><td>' +
+                '<span class="icon dashicons ' + backup.icon + '"></span>' + backup.name + '</td>' +
+                '<td>' + backup.size_mb + '</td><td>' + backup.date_i18n + '</td>' +
+                '<td><a href="' + backup.url + '" class="button button-cancel">' +
+                '<span class="icon dashicons dashicons-download"></span> Download</a>' +
+                ' <button data-action="deleteBackup" data-param="' + backup.name + '" class="button button-cancel">' +
+                ' <span class="icon dashicons dashicons-trash"></span> Delete</button></td></tr>');
 
         this.App.Events.deleteBackup();
+        this.rebuildBackupsTable();
     }
 
     /**
@@ -116,6 +131,8 @@ class Actions {
      * @param el
      */
     deleteBackup(backup, el) {
+        this.App.showLoader();
+
         jQuery.ajax({
             type: 'post',
             url: this.getApiUrl(),
@@ -130,9 +147,11 @@ class Actions {
                 if (true === response.success) {
                     this.deleteBackupRow(el);
                 }
+                this.App.hideLoader();
             },
             error: () => {
                 this.App.showMessage('Server error. Please, try again', false);
+                this.App.hideLoader();
             }
         });
     }
@@ -140,8 +159,29 @@ class Actions {
     /**
      *
      * @param el
+     *
      */
     deleteBackupRow(el) {
-        el.closest('tr').fadeOut('normal');
+        el.closest('tr').remove();
+        this.rebuildBackupsTable();
+    }
+
+    /**
+     *
+     */
+    rebuildBackupsTable() {
+        let table = this.App.getElement('[data-element=backupsTable]'),
+            no_backups = this.App.getElement('[data-element=noBackups]'),
+            count = table.find('tbody tr:not([data-element=noBackups])'),
+            number_row = table.find('tbody tr:not([data-element=noBackups]) td:first-child');
+
+        if (count.length === 0) {
+            no_backups.fadeIn('normal');
+        } else {
+            jQuery.each(number_row, (i, el) => {
+                jQuery(el).html(i);
+            });
+            no_backups.fadeOut('normal');
+        }
     }
 }

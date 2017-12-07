@@ -81,6 +81,9 @@ class AjaxController extends AbstractController
         $optionsService = $this->container->get(OptionsService::class);
         $optionsService->setOptions($_POST['options']);
 
+        $this->data['success'] = true;
+        $this->data['message'] = __('Options saved.', Container::key());
+
         if (!empty($_POST['amazon_s3']) && 'true' === $_POST['amazon_s3']) {
             /**
              * @var $s3Service S3Service
@@ -89,10 +92,10 @@ class AjaxController extends AbstractController
 
             if ($s3Service->isConnected()) {
                 $this->data['success'] = true;
-                $this->data['message'] = __('Options saved. Amazon S3 connection is successful.', Container::key());
+                $this->data['message'] .= ' '.__('Amazon S3 connection is successful.', Container::key());
             } else {
                 $this->data['success'] = false;
-                $this->data['message'] = __('Options saved. Amazon S3 connection failed', Container::key());
+                $this->data['message'] .= ' '.__('Amazon S3 connection failed', Container::key());
             }
         }
 
@@ -151,14 +154,15 @@ class AjaxController extends AbstractController
          * @var $backupService BackupService
          */
         $backupService = $this->container->get(BackupService::class);
-        $result = $backupService->deleteBackup($_POST['backup']);
+        $filename = (string) $_POST['backup'];
+        $result = $backupService->deleteBackup($filename);
 
-        if (true === $result) {
-            $this->data['success'] = true;
-            $this->data['message'] = __('Backup deleted', Container::key());
-        } else {
+        if ($result === false) {
             $this->data['success'] = false;
             $this->data['message'] = __('Backup not deleted', Container::key());
+        } else {
+            $this->data['success'] = true;
+            $this->data['message'] = __('Backup deleted', Container::key());
         }
 
         return $this->response();
