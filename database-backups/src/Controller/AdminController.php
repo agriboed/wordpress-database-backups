@@ -5,6 +5,7 @@ namespace DatabaseBackups\Controller;
 use DatabaseBackups\Core\AbstractController;
 use DatabaseBackups\Service\OptionsService;
 use DatabaseBackups\Service\BackupService;
+use DatabaseBackups\Exceptions\Exception;
 use DatabaseBackups\Model\BackupModel;
 use DatabaseBackups\Core\Container;
 
@@ -62,7 +63,7 @@ class AdminController extends AbstractController
 
     /**
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function renderPage()
     {
@@ -88,6 +89,7 @@ class AdminController extends AbstractController
             'directory' => OptionsService::getOption('directory', 'database-backups'),
             'limit' => OptionsService::getOption('limit', 0),
             'prefix' => (bool)OptionsService::getOption('prefix'),
+            'table' => DB_NAME,
             'prefix_default' => $backupModel->getPrefix(),
             'clean' => (bool)OptionsService::getOption('clean'),
             'notify' => (bool)OptionsService::getOption('notify'),
@@ -106,10 +108,14 @@ class AdminController extends AbstractController
             'amazon_s3_bucket' => OptionsService::getOption('amazon_s3_bucket'),
             'amazon_s3_key' => OptionsService::getOption('amazon_s3_key'),
             'amazon_s3_secret' => OptionsService::getOption('amazon_s3_secret'),
-            'num' => 0,
+            'i' => 0,
             'nonce' => wp_create_nonce(Container::key()),
             'admin_url' => admin_url('admin-ajax.php')
         ];
+
+        if (!file_exists(Container::pluginDir() . 'templates/admin.php')) {
+            throw new Exception('Template not found');
+        }
 
         include Container::pluginDir() . 'templates/admin.php';
     }

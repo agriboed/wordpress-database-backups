@@ -39,7 +39,6 @@ class OptionsService extends AbstractService
      * Set whole options
      *
      * @param array $options
-     * @throws \Exception
      */
     public function setOptions(array $options)
     {

@@ -3,6 +3,7 @@
 namespace DatabaseBackups\Service;
 
 use DatabaseBackups\Core\AbstractService;
+use DatabaseBackups\Exceptions\Exception;
 use DatabaseBackups\Model\BackupModel;
 use DatabaseBackups\Core\Container;
 
@@ -49,29 +50,35 @@ class BackupService extends AbstractService
      */
     public function createBackup()
     {
-        /**
-         * @var $backupModel BackupModel
-         */
-        $backupModel = $this->container->get(BackupModel::class);
+        try {
+            /**
+             * @var $backupModel BackupModel
+             */
+            $backupModel = $this->container->get(BackupModel::class);
 
-        $this->data = $backupModel->getTables(
-            OptionsService::getOption('prefix'),
-            OptionsService::getOption('limit', 0)
-        );
+            $this->data = $backupModel->getTables(
+                OptionsService::getOption('prefix'),
+                OptionsService::getOption('limit', 0)
+            );
 
-        $this->filename = 'db-backup-' . date('d_m_Y_H-i-s') . '_' . mt_rand(0, 10000) . '.sql';
+            $this->filename = 'db-backup-' . date('d_m_Y_H-i-s') . '_' . mt_rand(0, 10000) . '.sql';
+            $this->directory = WP_CONTENT_DIR . '/' . OptionsService::getOption('directory') . '/';
 
-        $this
-            ->checkDirectory()
-            ->cleanDataBeforeSave()
-            ->createSql()
-            ->convertDataToSql()
-            ->convertGzip()
-            ->convertEncoding()
-            ->createFile()
-            ->sendNotification();
+            $this
+                ->checkDirectory()
+                ->cleanDataBeforeSave()
+                ->convertDataToSql()
+                ->createSql()
+                ->convertGzip()
+                ->convertEncoding()
+                ->createFile()
+                ->putAmazonS3()
+                ->sendNotification();
 
-        return true;
+            return $this->filename;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -161,11 +168,32 @@ class BackupService extends AbstractService
      */
     protected function createSql()
     {
-        $this->sql = '';
+        $this->sql = "--\r\n";
+        $this->sql .= "-- MYSQL DUMP BY Database Backups Plugin\r\n";
+        $this->sql .= "-- https://wordpress.org/plugins/database-backups/\r\n";
+        $this->sql .= "--\r\n";
+        $this->sql .= 'CREATE DATABASE  IF NOT EXISTS `' . DB_NAME . "`;\r\n";
+        $this->sql .= 'USE `' . DB_NAME . "`;\r\n";
+        $this->sql .= "/* SET SQL_MODE='ALLOW_INVALID_DATES'; */\r\n";
+        $this->sql .= '/* DEFAULT CHARACTER SET ' . DB_CHARSET . "; */\r\n";
 
         foreach ($this->data as $table) {
-            $this->sql .= $table['create'] . ";\n\n";
-            $this->sql .= $table['data'] . "\n\n";
+            $this->sql .= "\r\n";
+            $this->sql .= "--\r\n";
+            $this->sql .= '-- Table structure for table `' . $table['name'] . "`\r\n";
+            $this->sql .= "--\r\n";
+            $this->sql .= "\r\n";
+            $this->sql .= $table['create'] . ';';
+            $this->sql .= "\r\n\r\n";
+
+            if (!empty($table['data'])) {
+                $this->sql .= "--\r\n";
+                $this->sql .= '-- Dumping data for table `' . $table['name'] . "`\r\n";
+                $this->sql .= "--\r\n";
+                $this->sql .= "\r\n";
+                $this->sql .= $table['data'] . ';';
+                $this->sql .= "\r\n";
+            }
         }
 
         return $this;
@@ -190,24 +218,27 @@ class BackupService extends AbstractService
      */
     protected function convertDataToSql()
     {
-        foreach ($this->data as &$table) {
+        foreach ($this->data as $key => $table) {
             $table['data'] = '';
             $pieces_count = 0;
 
-            if (!is_array($table['data_raw']) || count($table['data_raw']) > 0) {
+            if (!is_array($table['data_raw']) || count($table['data_raw']) === 0) {
                 break;
             }
 
-            $table['data'] .= 'INSERT INTO ' . $table['name'] . ' VALUES' . "\n";
+            $table['data'] .= 'INSERT INTO `' . $table['name'] . "` VALUES \r\n";
 
             foreach ($table['data_raw'] as $pieces) {
                 $pieces_count++;
-                $pieces = str_replace(["\n", "\r", "'"], ['\n', '\r', "''"], $pieces);
+                $pieces = str_replace(array("\n", "\r", "'"), array('\n', '\r', "''"), $pieces);
 
                 $table['data'] .= '(\'' . implode('\',\'', $pieces) . '\')';
                 $table['data'] .= ($pieces_count < count($table['data_raw'])) ? ',' . "\n" : ';' . "\n";
             }
+
+            $this->data[$key] = $table;
         }
+
 
         return $this;
     }
@@ -260,6 +291,28 @@ class BackupService extends AbstractService
 
     /**
      * @return $this
+     * @throws \InvalidArgumentException
+     * @throws \DatabaseBackups\Exceptions\Exception
+     */
+    protected function putAmazonS3()
+    {
+        if (true !== (bool)OptionsService::getOption('amazon_s3')) {
+            return $this;
+        }
+
+        $handle = fopen($this->directory . $this->filename, 'rb+');
+
+        /**
+         * @var $s3Service S3Service
+         */
+        $s3Service = $this->container->get(S3Service::class);
+        $s3Service->set($this->filename, $handle);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
      * @throws \RuntimeException
      */
     protected function sendNotification()
@@ -269,29 +322,25 @@ class BackupService extends AbstractService
         }
 
         $backup = $this->getBackup($this->filename);
-
-        if (null === $backup) {
-            throw new \RuntimeException('Backup file not found');
-        }
-
         $blog_name = get_option('blogname');
 
         $html = '';
+        $date = date_i18n(get_option('date_format') . ' H:i:s');
+        $backup_date = date_i18n(get_option('date_format') . ' H:i:s', $backup['date']);
 
-        if (!$backup || $backup['size'] === 0) {
-            $subject = __('Database Backup was not created at', Container::key()) . ' ' . $blog_name;
-            $html .= '<p></p><p>' . __('Database Backup was not created. Please check settings.',
+        if (null === $backup || $backup['size'] === 0) {
+            $subject = __('Backup not created on', Container::key()) . ' ' . $blog_name;
+            $html .= '<p></p><p>' . __('Backup not created. Please check your settings.',
                     'database-backups') . '</p>';
-            $html .= '<p>' . __('Date') . ': ' . date_i18n('j M Y H:i') . '</p>';
+            $html .= '<p>' . __('Date') . ': ' . $date . '</p>';
         } else {
             $subject = __('Database Backup was created at ', 'database-backups') . $blog_name;
             $html .= '<p></p><p>' . __('Database Backup successfully created.', 'database-backups') . '</p>';
-            $html .= '<br><strong>' . __('Date', 'database-backups') . '</strong>: ' . date_i18n('j M Y H:i',
-                    $backup['date']);
+            $html .= '<br><strong>' . __('Date', Container::key()) . '</strong>: ' . $backup_date;
             $html .= '<br><strong>' . __('Size',
-                    'database-backups') . '</strong>: ' . round($backup['size'] / 1024 / 1024, 2) . ' MB';
-            $html .= '<br><strong>' . __('Extension', 'database-backups') . '</strong>: ' . $backup['format'];
-            $html .= '<br><strong>' . __('Download', 'database-backups') . '</strong>: ' . $backup['url'];
+                    Container::key()) . '</strong>: ' . round($backup['size'] / 1024 / 1024, 2) . ' MB';
+            $html .= '<br><strong>' . __('Extension', Container::key()) . '</strong>: ' . $backup['format'];
+            $html .= '<br><strong>' . __('Download', Container::key()) . '</strong>: ' . $backup['url'];
         }
         $html .= '<p></p><hr><p><a href="' . get_option('siteurl') . '">' . $blog_name . '</a></p>';
 
@@ -302,7 +351,7 @@ class BackupService extends AbstractService
 
     /**
      *
-     * @throws \RuntimeException
+     * @throws Exception
      */
     protected function readBackups()
     {
@@ -350,7 +399,7 @@ class BackupService extends AbstractService
     /**
      * @param $name
      * @return bool|mixed
-     * @throws \RuntimeException
+     * @throws Exception
      */
     public function getBackup($name)
     {
@@ -367,21 +416,20 @@ class BackupService extends AbstractService
 
     /**
      * @return array
-     * @throws \RuntimeException
+     * @throws Exception
      */
     public function getBackups()
     {
         $this->backups = [];
 
         $directory_name = OptionsService::getOption('directory');
-        $wp_upload_dir = wp_upload_dir();
 
         if (!empty($directory_name)) {
-            $this->url = $wp_upload_dir['baseurl'] . '/' . $directory_name . '/';
-            $this->directory = $wp_upload_dir['basedir'] . '/' . $directory_name . '/';
+            $this->url = get_site_url() . '/wp-content/' . $directory_name . '/';
+            $this->directory = WP_CONTENT_DIR . '/' . $directory_name . '/';
         } else {
-            $this->url = $wp_upload_dir['baseurl'] . '/database-backups/';
-            $this->directory = $wp_upload_dir['basedir'] . '/database-backups/';
+            $this->url = get_site_url() . '/wp-content/database-backups/';
+            $this->directory = WP_CONTENT_DIR. '/database-backups/';
         }
 
         $this
@@ -397,6 +445,9 @@ class BackupService extends AbstractService
      */
     public function deleteBackup($filename)
     {
+        $this->directory = WP_CONTENT_DIR . '/' . OptionsService::getOption('directory') . '/';
+        $filename = str_replace(['../', './', '/'], '', $filename);
+
         if (!is_file($this->directory . $filename) ||
             !mb_substr($filename, -4) === '.sql' || !mb_substr($filename, -7) === '.sql.gz'
         ) {
@@ -416,7 +467,7 @@ class BackupService extends AbstractService
 
     /**
      * @return float|int
-     * @throws \RuntimeException
+     * @throws Exception
      */
     public function getOccupiedSpace()
     {

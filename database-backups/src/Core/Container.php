@@ -2,6 +2,7 @@
 
 namespace DatabaseBackups\Core;
 
+use DatabaseBackups\Exceptions\Exception;
 use DatabaseBackups\Interfaces\DependencyInterface;
 
 /**
@@ -99,13 +100,13 @@ class Container
      * @param array $arguments
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function get($dependency, array $arguments = [])
     {
         if (!isset($this->dependencies[$dependency])) {
             if (!class_exists($dependency)) {
-                throw new \LogicException('Dependency not found');
+                throw new Exception('Dependency not found');
             }
 
             if (empty($arguments)) {

@@ -319,7 +319,7 @@
     <div class="wrap">
         <h2><?php _e('Previously created backups', $data['key']); ?></h2>
 
-        <table class='wp-list-table widefat striped'>
+        <table class="wp-list-table widefat striped" data-element="backupsTable">
             <thead>
             <tr>
                 <th><?php _e('ID', $data['key']); ?></th>
@@ -353,10 +353,10 @@
                         <?php echo $backup['date_i18n']; ?>
                     </td>
                     <td>
-                        <a href="<?php echo $backup['url']; ?>" class="button button-link download">
+                        <a href="<?php echo $backup['url']; ?>" class="button button-cancel">
                             <span class="icon dashicons dashicons-download"></span> <?php _e('Download',
                                 $data['key']); ?></a>
-                        <button data-id="<?php echo $backup['name']; ?>" class="button button-cancel delete">
+                        <button data-action="deleteBackup" data-param="<?php echo $backup['name']; ?>" class="button button-cancel">
                             <span class="icon dashicons dashicons-trash"></span> <?php _e('Delete', $data['key']); ?>
                         </button>
                     </td>

@@ -3,6 +3,7 @@
 namespace DatabaseBackups\Service;
 
 use DatabaseBackups\Core\AbstractService;
+use DatabaseBackups\Exceptions\Exception;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 
@@ -20,6 +21,7 @@ class S3Service extends AbstractService
 
     /**
      * S3Service constructor.
+     * @throws \InvalidArgumentException
      */
     public function __construct()
     {
@@ -54,7 +56,8 @@ class S3Service extends AbstractService
             if (false === $bucketIsset) {
                 $this->client = null;
             }
-        } catch (\Exception $exception) {
+
+        } catch (Exception $exception) {
             $this->client = null;
         }
     }
@@ -85,15 +88,15 @@ class S3Service extends AbstractService
             'Bucket' => $this->bucket,
             'Key' => $key
         ));
-
     }
 
     /**
      * @param $key
+     * @param $data
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public function set($key)
+    public function set($key, $data)
     {
         if (false === $this->isConnected()) {
             return false;
@@ -103,16 +106,14 @@ class S3Service extends AbstractService
             $this->client->putObject([
                 'Bucket' => $this->bucket,
                 'Key' => $key,
-                'Body' => fopen(__DIR__ . '/readme.txt', 'rb'),
+                'Body' => 'sss',
                 'ACL' => 'private',
             ]);
         } catch (S3Exception $e) {
-            echo "There was an error uploading the file.\n";
 
             return false;
         }
 
         return true;
     }
-
 }

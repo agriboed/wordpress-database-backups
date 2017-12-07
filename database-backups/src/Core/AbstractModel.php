@@ -7,9 +7,14 @@ use DatabaseBackups\Interfaces\DependencyInterface;
 class AbstractModel implements DependencyInterface
 {
     /**
-     * @var \wpdb
+     * @var \PDO
      */
     protected $db;
+
+    /**
+     * @var \wpdb
+     */
+    protected $wpdb;
 
     /**
      * @var Container
@@ -23,7 +28,9 @@ class AbstractModel implements DependencyInterface
     {
         global $wpdb;
 
-        $this->db = $wpdb;
+        $this->wpdb = $wpdb;
+        $this->db = new \PDO('mysql:host=' . DB_HOST . '; dbname=' . DB_NAME, DB_USER, DB_PASSWORD);
+        $this->db->exec('SET NAMES "' . DB_CHARSET . '"');
     }
 
     /**
@@ -31,7 +38,7 @@ class AbstractModel implements DependencyInterface
      */
     public function getPrefix()
     {
-        return $this->db->prefix;
+        return $this->wpdb->prefix;
     }
 
     /**

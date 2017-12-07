@@ -5,8 +5,8 @@ namespace DatabaseBackups\Controller;
 use DatabaseBackups\Core\AbstractController;
 use DatabaseBackups\Service\OptionsService;
 use DatabaseBackups\Service\BackupService;
-use DatabaseBackups\Core\Container;
 use DatabaseBackups\Service\S3Service;
+use DatabaseBackups\Core\Container;
 
 /**
  * Class AjaxController
@@ -17,7 +17,7 @@ class AjaxController extends AbstractController
     /**
      * @var array
      */
-    protected $data = [];
+    protected $data;
 
     /**
      *
@@ -26,27 +26,53 @@ class AjaxController extends AbstractController
     {
         add_action('wp_ajax_' . Container::key() . '_options', [$this, 'saveOptions']);
         add_action('wp_ajax_' . Container::key() . '_create', [$this, 'createBackup']);
-        add_action('wp_ajax_' . Container::key() . '_deletes', [$this, 'deleteBackup']);
+        add_action('wp_ajax_' . Container::key() . '_delete', [$this, 'deleteBackup']);
     }
 
     /**
-     * @param $nonce
+     * Check WP Nonce field
+     *
+     * @param bool $nonce
      * @return bool
      */
-    protected function checkNonce($nonce)
+    protected function checkNonce($nonce = false)
     {
-        return wp_create_nonce(Container::key()) === $nonce;
+        if (false === $nonce && empty($_POST['nonce'])) {
+            $this->data['success'] = false;
+            $this->data['message'] = __('Security error', Container::key());
+
+            return false;
+        }
+
+        $nonce = ($nonce !== false) ? $nonce : $_POST['nonce'];
+
+        if (wp_create_nonce(Container::key()) !== $nonce) {
+            $this->data['success'] = false;
+            $this->data['message'] = __('Security error', Container::key());
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Method: POST
      *
-     * @throws \Exception
+     * @throws \DatabaseBackups\Exceptions\Exception
+     * @throws \InvalidArgumentException
      */
     public function saveOptions()
     {
+        if (false === $this->checkNonce()) {
+            $this->data['success'] = false;
+            $this->data['message'] = __('Security error', Container::key());
+            return $this->response();
+        }
+
         if (empty($_POST['options']) || !is_array($_POST['options'])) {
-            return $this->response(false, __('Nothing to save', Container::key()));
+            $this->data['success'] = false;
+            $this->data['message'] = __('Nothing to save', Container::key());
+            return $this->response();
         }
 
         /**
@@ -61,12 +87,16 @@ class AjaxController extends AbstractController
              */
             $s3Service = $this->container->get(S3Service::class);
 
-            return $s3Service->isConnected() ?
-                $this->response(true, __('Options saved. Amazon S3 connection is successful.', Container::key())) :
-                $this->response(false, __('Options saved. Amazon S3 connection failed', Container::key()));
+            if ($s3Service->isConnected()) {
+                $this->data['success'] = true;
+                $this->data['message'] = __('Options saved. Amazon S3 connection is successful.', Container::key());
+            } else {
+                $this->data['success'] = false;
+                $this->data['message'] = __('Options saved. Amazon S3 connection failed', Container::key());
+            }
         }
 
-        return $this->response(true, __('Options saved', Container::key()));
+        return $this->response();
     }
 
     /**
@@ -76,7 +106,7 @@ class AjaxController extends AbstractController
      */
     public function createBackup()
     {
-        if (!isset($_POST['nonce']) || !$this->checkNonce($_POST['nonce'])) {
+        if (false === $this->checkNonce()) {
             return $this->response();
         }
 
@@ -84,8 +114,20 @@ class AjaxController extends AbstractController
          * @var $backupService BackupService
          */
         $backupService = $this->container->get(BackupService::class);
-        //$backupService->createBackup();
-        return $this->response(true);
+        $result = $backupService->createBackup();
+
+        if (false === $result) {
+            $this->data['success'] = false;
+            $this->data['message'] = __('Backup not created', Container::key());
+
+            return $this->response();
+        }
+
+        $this->data['success'] = true;
+        $this->data['message'] = __('Backup created successful', Container::key());
+        $this->data['backup'] = $backupService->getBackup($result);
+
+        return $this->response();
     }
 
     /**
@@ -95,7 +137,13 @@ class AjaxController extends AbstractController
      */
     public function deleteBackup()
     {
-        if (!isset($_POST['delete']) || 0 === (int)$_POST['delete']) {
+        if (false === $this->checkNonce()) {
+            return $this->response();
+        }
+
+        if (empty($_POST['backup'])) {
+            $this->data['success'] = false;
+            $this->data['message'] = 'Nothing to delete';
             return $this->response();
         }
 
@@ -103,20 +151,24 @@ class AjaxController extends AbstractController
          * @var $backupService BackupService
          */
         $backupService = $this->container->get(BackupService::class);
-        $backupService->deleteBackup($_POST['delete']);
+        $result = $backupService->deleteBackup($_POST['backup']);
 
-        return $this->response(true);
+        if (true === $result) {
+            $this->data['success'] = true;
+            $this->data['message'] = __('Backup deleted', Container::key());
+        } else {
+            $this->data['success'] = false;
+            $this->data['message'] = __('Backup not deleted', Container::key());
+        }
+
+        return $this->response();
     }
 
     /**
-     * @param bool $success
-     * @param string $message
+     *
      */
-    protected function response($success = false, $message = '')
+    protected function response()
     {
-        $this->data['success'] = $success;
-        $this->data['message'] = $message;
-
         echo json_encode($this->data);
         wp_die();
     }

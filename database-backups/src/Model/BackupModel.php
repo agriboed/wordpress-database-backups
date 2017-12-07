@@ -26,11 +26,11 @@ class BackupModel extends AbstractModel
         /**
          * @var $tables array
          */
-        $tables = $this->db->query('SHOW TABLES')->fetchAll();
+        $tables = $this->db->query('SHOW TABLES')->fetchAll(3);
 
         if (true === $isPrefix) {
             foreach ($tables as $key => $table) {
-                if (0 !== strpos($table[0], $this->db->prefix)) {
+                if (0 !== strpos($table[0], $this->wpdb->prefix)) {
                     unset($tables[$key]);
                 }
             }
@@ -41,6 +41,7 @@ class BackupModel extends AbstractModel
 
             $this->tables[$name]['name'] = $name;
             $this->tables[$name]['create'] = $this->getColumns($name);
+
             $table_count = $this->getDataCount($name);
 
             $limit = $limit > 0 ? $limit : 1000;
@@ -70,9 +71,8 @@ class BackupModel extends AbstractModel
      */
     protected function getColumns($tableName)
     {
-        $query = $this->db->prepare('SHOW CREATE TABLE %s', [$tableName]);
-        $result = $this->db->query($query)->fetchAll();
-
+        $query = $this->db->query('SHOW CREATE TABLE ' . $tableName);
+        $result = $query->fetchAll();
         $q[0][1] = preg_replace("/AUTO_INCREMENT=[\w]*./", '', $result[0][1]);
 
         return $q[0][1];
@@ -85,9 +85,10 @@ class BackupModel extends AbstractModel
      */
     protected function getDataCount($tableName)
     {
-        $query = $this->db->prepare('SELECT count(*) FROM %s', [$tableName]);
+        $query = $this->db->prepare('SELECT COUNT(*) FROM ' . $tableName);
+        $query->execute([$tableName]);
 
-        return $this->db->query($query)->fetchColumn();
+        return $query->fetchColumn();
     }
 
     /**
@@ -98,8 +99,7 @@ class BackupModel extends AbstractModel
      */
     protected function getData($tableName, $start, $limit)
     {
-        $query = $this->db->prepare('SELECT * FROM %s LIMIT %d, %d', [$tableName, $start, $limit]);
-
-        return $this->db->query($query)->fetchAll(3);
+        $query = $this->db->query('SELECT * FROM ' . $tableName . ' LIMIT ' . (int)$start . ', ' . (int)$limit . ';');
+        return $query->fetchAll(\PDO::FETCH_NUM);
     }
 }

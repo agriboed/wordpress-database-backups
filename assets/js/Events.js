@@ -8,7 +8,7 @@ class Events {
      *
      */
     init() {
-        this.bindToggle().createBackup().saveOptions();
+        this.bindToggle().createBackup().deleteBackup().saveOptions();
     }
 
     /**
@@ -44,10 +44,28 @@ class Events {
      * @return Events
      */
     createBackup() {
-        let el = this.App.getElement('button[data-action=create]');
-
+        let el = this.App.getElement('[data-action=createBackup]');
         el.click(() => {
             this.App.Actions.createBackup();
+        });
+
+        return this;
+    }
+
+
+    /**
+     * @return Events
+     */
+    deleteBackup() {
+        let el = this.App.getElement('[data-action=deleteBackup]');
+
+        el.click((e) => {
+            let el = jQuery(e.target);
+            let filename = el.data('param');
+
+            if (filename) {
+                this.App.Actions.deleteBackup(filename, el);
+            }
         });
 
         return this;
