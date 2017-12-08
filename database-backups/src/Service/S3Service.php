@@ -2,10 +2,10 @@
 
 namespace DatabaseBackups\Service;
 
-use Aws\Exception\AwsException;
 use DatabaseBackups\Core\AbstractService;
 use DatabaseBackups\Exceptions\Exception;
 use Aws\S3\Exception\S3Exception;
+use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 
 class S3Service extends AbstractService

@@ -16,7 +16,7 @@ class BackupService extends AbstractService
     /**
      * @var array
      */
-    protected $backups = [];
+    protected $backups;
 
     /**
      * @var string
@@ -31,21 +31,20 @@ class BackupService extends AbstractService
     /**
      * @var array
      */
-    protected $data = [];
+    protected $data;
 
     /**
      * @var string
      */
-    protected $sql = '';
+    protected $sql;
 
     /**
      * @var string
      */
-    protected $filename = '';
+    protected $filename;
 
     /**
      * @return bool
-     *
      * @throws \Exception
      */
     public function createBackup()
@@ -76,7 +75,7 @@ class BackupService extends AbstractService
                 ->sendNotification();
 
             return $this->filename;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -338,11 +337,11 @@ class BackupService extends AbstractService
         if (null === $backup || $backup['size'] === 0) {
             $subject = __('Backup not created on', Container::key()) . ' ' . $blog_name;
             $html .= '<p></p><p>' . __('Backup not created. Please check your settings.',
-                    'database-backups') . '</p>';
-            $html .= '<p>' . __('Date') . ': ' . $date . '</p>';
+                    Container::key()) . '</p>';
+            $html .= '<p>' . __('Date', Container::key()) . ': ' . $date . '</p>';
         } else {
-            $subject = __('Database Backup was created at ', 'database-backups') . $blog_name;
-            $html .= '<p></p><p>' . __('Database Backup successfully created.', 'database-backups') . '</p>';
+            $subject = __('Database Backup was created at ', Container::key()) . $blog_name;
+            $html .= '<p></p><p>' . __('Database Backup successfully created.', Container::key()) . '</p>';
             $html .= '<br><strong>' . __('Date', Container::key()) . '</strong>: ' . $backup_date;
             $html .= '<br><strong>' . __('Size',
                     Container::key()) . '</strong>: ' . round($backup['size'] / 1024 / 1024, 2) . ' MB';
@@ -397,7 +396,6 @@ class BackupService extends AbstractService
         }
 
         rsort($files);
-
         $this->backups = $files;
 
         return $this;
@@ -455,8 +453,7 @@ class BackupService extends AbstractService
             return false;
         }
 
-        if (true === (bool)OptionsService::getOption('amazon_s3'))
-        {
+        if (true === (bool)OptionsService::getOption('amazon_s3')) {
             /**
              * @var $s3Service S3Service
              */
@@ -470,7 +467,6 @@ class BackupService extends AbstractService
     /**
      *
      * @throws \DatabaseBackups\Exceptions\Exception
-     * @throws \InvalidArgumentException
      */
     public function checkOldCopies()
     {
@@ -496,7 +492,7 @@ class BackupService extends AbstractService
             }
         }
 
-        if ($days > 0) {
+        if ($days > 0 && !empty($this->backups)) {
             foreach ($this->backups as $backup) {
                 $check_date = new \DateTime('-' . $days . ' ');
                 $file_date = new \DateTime();

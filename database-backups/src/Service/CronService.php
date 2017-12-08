@@ -2,10 +2,16 @@
 
 namespace DatabaseBackups\Service;
 
+use DatabaseBackups\Exceptions\Exception;
+use DatabaseBackups\Interfaces\HooksInterface;
 use DatabaseBackups\Core\AbstractService;
 use DatabaseBackups\Core\Container;
 
-class CronService extends AbstractService
+/**
+ * Class CronService
+ * @package DatabaseBackups\Service
+ */
+class CronService extends AbstractService implements HooksInterface
 {
     /**
      *
@@ -21,6 +27,16 @@ class CronService extends AbstractService
      */
     public function cronCheck()
     {
+        if (true !== OptionsService::getOption('cron')) {
+            $this->clearSchedule();
+            return;
+        }
+
+        add_action(Container::key() . '-cron', [$this, 'doCronJobs']);
+
+        if (!wp_next_scheduled(Container::key() . '-cron')) {
+            wp_schedule_event(time(), OptionsService::getOption('cron_frequency'), 'database-backups-cron');
+        }
     }
 
     /**
@@ -31,6 +47,11 @@ class CronService extends AbstractService
      */
     public function cronSchedules($schedules)
     {
+        $schedules['daily'] = [
+            'interval' => 60 * 60 * 24,
+            'display' => __('Every Day', Container::key())
+        ];
+
         $schedules['weekly'] = [
             'interval' => 60 * 60 * 24 * 7,
             'display' => __('Once Weekly', Container::key())
@@ -56,6 +77,24 @@ class CronService extends AbstractService
      */
     public function clearSchedule()
     {
-        wp_clear_scheduled_hook(Container::key().'-cron');
+        wp_clear_scheduled_hook(Container::key() . '-cron');
+    }
+
+    /**
+     *
+     * @throws Exception
+     */
+    public function doCronJobs()
+    {
+        try {
+            /**
+             * @var $backupService BackupService
+             */
+            $backupService = $this->container->get(BackupService::class);
+            $backupService->checkOldCopies();
+            $backupService->createBackup();
+        } catch (Exception $exception) {
+
+        }
     }
 }
