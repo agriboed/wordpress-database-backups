@@ -2,7 +2,6 @@
 
 namespace DatabaseBackups\Interfaces;
 
-interface HooksInterface
-{
-    public function initHooks();
+interface HooksInterface {
+	public function initHooks();
 }

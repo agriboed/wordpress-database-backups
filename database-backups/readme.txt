@@ -3,24 +3,22 @@ Contributors: AGriboed
 Donate link: http://v1rus.ru
 Tags: backup, database, backup database, back up, backups, data base, database, database backup, db backup, dump, file, file backup, full backup, page backup, recover, recovery, restore, schedule, schedule backup, scheduled backup, schema, schema backup, site, site backup, web backup, web page, web page backup, WooCommerce backup
 Requires at least: 4
-Tested up to: 4.5.3
-Stable tag: 1.2.2.6
-License: GPLv2 or later
+Tested up to: 4.9.1
+Stable tag: 1.3.0
+License: MIT
 
-Simple Plugin that allows do backup of database tables. Manually or auto.
-Бэкапы базы это просто!
+Plugin helps create copies of your database in automatic mode with some period and save them on your server and on Amazon S3.
 
 == Description ==
-Simple plugin that allows to do backups of your database tables. Do it manually or use auto mode. 
+Plugin helps create copies of your database in automatic mode with some period and save them on your server and on Amazon S3.
 
 
-* enable option what allow to delete the old copies without your participation
-* use backups compression to take less space
-* use limits of queries to DB to reduce the load on the server
-* save only wordpress tables or all tables
-* save only clean version your database without trash
-* get notify on email of result your backup
-* set up plugin in 5 minutes and and trust him to keep your information
+* allows deleting old copies without your participation
+* has compression to take less space
+* has feature to limit of queries to DB to reduce the load on the server
+* has ability to save only WP tables instead a whole database
+* has ability to save only "clean" version without unnecessary entries (like revisions, spam comments etc.)
+* sends a notify to you with result of the last backup
 
 Backups of database - do it simple!
 
@@ -46,6 +44,10 @@ skype: agriboed
 2. Work area
 
 == Changelog ==
+= 1.3.0 =
+* Added support of Amazon S3
+* Bug fixes
+
 = 1.2.2.6 =
 * Change section in admin menu
 * Added link to download at admin email
@@ -53,7 +55,7 @@ skype: agriboed
 
 = 1.2.2.4 =
 * Fixed link in Plugins List
-* Fixed shedules list
+* Fixed schedules list
 
 = 1.2.2.3 =
 * Fixed charset error when quering from database

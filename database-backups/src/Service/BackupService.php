@@ -16,7 +16,7 @@ class BackupService extends AbstractService
     /**
      * @var array
      */
-    protected $backups = [];
+    protected $backups = array();
 
     /**
      * @var string
@@ -31,7 +31,7 @@ class BackupService extends AbstractService
     /**
      * @var array
      */
-    protected $data = [];
+    protected $data = array();
 
     /**
      * @var string
@@ -93,8 +93,8 @@ class BackupService extends AbstractService
             return $this;
         }
 
-        $deletedComments = [];
-        $deletedPosts = [];
+        $deletedComments = array();
+        $deletedPosts = array();
 
         /**
          * @var $backupModel BackupModel
@@ -362,9 +362,9 @@ class BackupService extends AbstractService
      */
     protected function readBackups()
     {
-        $this->backups = [];
+        $this->backups = array();
         $dh = opendir($this->directory);
-        $files = [];
+        $files = array();
 
         $date_format = get_option('date_format');
 
@@ -429,7 +429,7 @@ class BackupService extends AbstractService
      */
     public function getBackups()
     {
-        $this->backups = [];
+        $this->backups = array();
 
         $this
             ->checkDirectory()

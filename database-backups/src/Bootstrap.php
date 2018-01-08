@@ -2,47 +2,50 @@
 
 namespace DatabaseBackups;
 
-
 use DatabaseBackups\Interfaces\DependencyInterface;
 use DatabaseBackups\Interfaces\HooksInterface;
 use DatabaseBackups\Core\Container;
 
-class Bootstrap
-{
-    /**
-     * @var string
-     */
-    protected $key = 'database-backups';
+class Bootstrap {
+	/**
+	 * @var string
+	 */
+	protected static $key = 'database-backups';
 
-    /**
-     * Objects will be started automatically while loading
-     *
-     * @var array
-     */
-    protected $autostart = [
-        \DatabaseBackups\Controller\AdminController::class,
-        \DatabaseBackups\Service\CronService::class,
-        \DatabaseBackups\Controller\AjaxController::class
-    ];
+	/**
+	 * @var Container
+	 */
+	protected $container;
 
-    /**
-     * Bootstrap constructor.
-     * @param string $plugin
-     */
-    public function __construct($plugin)
-    {
-        $this->container = new Container($plugin, $this->key);
+	/**
+	 * Objects will be started automatically while loading
+	 *
+	 * @var array
+	 */
+	protected $autostart = [
+		\DatabaseBackups\Controller\AdminController::class,
+		\DatabaseBackups\Service\CronService::class,
+		\DatabaseBackups\Controller\AjaxController::class
+	];
 
-        foreach ($this->autostart as $class) {
-            $object = new $class;
+	/**
+	 * Bootstrap constructor.
+	 *
+	 * @param string $plugin
+	 */
+	public function __construct( $plugin ) {
+		$this->container = new Container( $plugin, static::$key );
 
-            if ($object instanceof DependencyInterface) {
-                $object->setContainer($this->container);
-            }
+		foreach ( $this->autostart as $class ) {
+			$object = new $class;
 
-            if ($object instanceof HooksInterface) {
-                $object->initHooks();
-            }
-        }
-    }
+			if ( $object instanceof DependencyInterface ) {
+				$object->setContainer( $this->container );
+			}
+
+			if ( $object instanceof HooksInterface ) {
+				$object->initHooks();
+			}
+		}
+	}
 }

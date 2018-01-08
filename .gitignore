@@ -1,5 +1,5 @@
 .idea/
+.log
 node_modules/
-database-backups/assets/css/
-database-backups/assets/js/
-database-backups/assets/images
+database-backups/assets/*
+database-backups/vendor/*

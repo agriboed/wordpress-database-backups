@@ -11,7 +11,7 @@
     "url": "git+https://github.com/agriboed/wordpress-teamleader-plugin.git"
   },
   "author": "AGriboed",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/agriboed/wordpress-database-backups/issues"
   },
