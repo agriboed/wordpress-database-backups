@@ -1,6 +1,6 @@
 === Database Backups ===
 Contributors: AGriboed
-Donate link: http://v1rus.ru
+Donate link: https://v1rus.ru
 Tags: backup, database, backup database, back up, backups, data base, database, database backup, db backup, dump, file, file backup, full backup, page backup, recover, recovery, restore, schedule, schedule backup, scheduled backup, schema, schema backup, site, site backup, web backup, web page, web page backup, WooCommerce backup
 Requires at least: 4
 Tested up to: 4.9.1
@@ -21,8 +21,9 @@ Plugin helps create copies of your database in automatic mode with some period a
 
 Backups of database - do it simple!
 
+[Contribute on GitHub](https://github.com/agriboed/wordpress-database-backups)
 
-Support and suggestions, [Support](http://v1rus.ru/database-backups-wordpress/)
+Support and suggestions, [Support](https://v1rus.ru/database-backups-wordpress/)
 skype: agriboed
 
 = Languages =
