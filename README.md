@@ -2,6 +2,7 @@
 
 Plugin helps create copies of your database in automatic mode with some period and save them on your server and on Amazon S3.
 
+Page on Official Wordpress website https://wordpress.org/plugins/database-backups/
 
 **Installation**
 1. Upload the `database-backups` folder to the `/wp-content/plugins/` directory
