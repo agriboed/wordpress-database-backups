@@ -2,10 +2,11 @@
 
 namespace DatabaseBackups\Service;
 
+use DatabaseBackups\Interfaces\HooksInterface;
 use DatabaseBackups\Core\AbstractService;
 use DatabaseBackups\Core\Container;
 
-class CronService extends AbstractService {
+class CronService extends AbstractService implements HooksInterface {
 	/**
 	 *
 	 */
@@ -31,11 +32,11 @@ class CronService extends AbstractService {
 	/**
 	 * Adds new schedules to WP
 	 *
-	 * @param $schedules
+	 * @param array $schedules
 	 *
 	 * @return array
 	 */
-	public function cronSchedules( $schedules ) {
+	public function cronSchedules( array $schedules ) {
 		$schedules['weekly']        = [
 			'interval' => 60 * 60 * 24 * 7,
 			'display'  => __( 'Once Weekly', Container::key() )

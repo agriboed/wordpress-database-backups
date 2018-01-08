@@ -12,7 +12,7 @@ class BackupModel extends AbstractModel {
 	/**
 	 * @var array
 	 */
-	protected $tables = array();
+	protected $tables = [];
 
 	/**
 	 * @param bool $isPrefix

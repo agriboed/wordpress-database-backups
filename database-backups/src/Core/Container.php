@@ -37,13 +37,20 @@ class Container {
 	protected static $plugin_url;
 
 	/**
+	 * @var string
+	 */
+	protected static $version;
+
+	/**
 	 * Container constructor.
 	 *
 	 * @param $plugin
 	 * @param $key
+	 * @param string $version
 	 */
-	public function __construct( $plugin, $key ) {
+	public function __construct( $plugin, $key, $version = '' ) {
 		static::$key        = $key;
+		static::$version    = $version;
 		static::$basename   = plugin_basename( $plugin );
 		static::$plugin_dir = plugin_dir_path( $plugin );
 		static::$plugin_url = plugin_dir_url( $plugin );
@@ -54,6 +61,13 @@ class Container {
 	 */
 	public static function key() {
 		return static::$key;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function version() {
+		return static::$version;
 	}
 
 	/**

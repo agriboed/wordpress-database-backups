@@ -293,7 +293,8 @@
                 </td>
                 <td>
                     <p class="description">
-						<?php _e( 'Name of your bucket', $data['key'] ); ?>
+						<?php _e( 'Name of your <a href="https://s3.console.aws.amazon.com/s3/buckets/" target=_blank>bucket</a>.',
+							$data['key'] ); ?>
                     </p>
                 </td>
             </tr>

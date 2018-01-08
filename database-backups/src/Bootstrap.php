@@ -13,6 +13,11 @@ class Bootstrap {
 	protected static $key = 'database-backups';
 
 	/**
+	 * @var string
+	 */
+	protected static $version = '1.3.0';
+
+	/**
 	 * @var Container
 	 */
 	protected $container;
@@ -34,7 +39,7 @@ class Bootstrap {
 	 * @param string $plugin
 	 */
 	public function __construct( $plugin ) {
-		$this->container = new Container( $plugin, static::$key );
+		$this->container = new Container( $plugin, static::$key, static::$version );
 
 		foreach ( $this->autostart as $class ) {
 			$object = new $class;

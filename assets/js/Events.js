@@ -1,93 +1,94 @@
+/* eslint-disable no-undef */
 class Events {
-    constructor(App) {
-        this.App = App;
-        this.init();
-    }
+  constructor (App) {
+    this.App = App
+    this.init()
+  }
 
-    /**
-     *
-     */
-    init() {
-        this.bindToggle().createBackup().deleteBackup().saveOptions();
-    }
+  /**
+   *
+   */
+  init () {
+    this.bindToggle().createBackup().deleteBackup().saveOptions()
+  }
 
-    /**
-     * Toggles
-     */
-    bindToggle() {
-        let el = this.App.getElement('[data-action=toggle]');
+  /**
+   * Toggles
+   */
+  bindToggle () {
+    let el = this.App.getElement('[data-action=toggle]')
 
-        el.each((i, e) => {
-            let el = jQuery(e),
-                container_name = el.data('param-container'),
-                container = this.App.getElement('[data-container=' + container_name + ']');
+    el.each((i, e) => {
+      let el = jQuery(e)
+      let containerName = el.data('param-container')
+      let container = this.App.getElement('[data-container=' + containerName +
+        ']')
 
-            if (container === undefined) {
-                return;
-            }
+      if (container === undefined) {
+        return
+      }
 
-            if (el.data('param-show') === true) {
-                container.show();
-            } else {
-                container.hide();
-            }
+      if (el.data('param-show') === true) {
+        container.show()
+      } else {
+        container.hide()
+      }
 
-            el.click(() => {
-                container.toggle('normal');
-            });
-        });
+      el.click(() => {
+        container.toggle('normal')
+      })
+    })
 
-        return this;
-    }
+    return this
+  }
 
-    /**
-     * @return Events
-     */
-    createBackup() {
-        let el = this.App.getElement('[data-action=createBackup]');
-        el.click(() => {
-            this.App.Actions.createBackup();
-        });
+  /**
+   * @return Events
+   */
+  createBackup () {
+    let el = this.App.getElement('[data-action=createBackup]')
+    el.click(() => {
+      this.App.Actions.createBackup()
+    })
 
-        return this;
-    }
+    return this
+  }
 
+  /**
+   * @return Events
+   */
+  deleteBackup () {
+    let el = this.App.getElement('[data-action=deleteBackup]')
 
-    /**
-     * @return Events
-     */
-    deleteBackup() {
-        let el = this.App.getElement('[data-action=deleteBackup]');
+    el.unbind()
 
-        el.unbind();
+    el.click((e) => {
+      let el = jQuery(e.target)
+      let filename = el.data('param')
 
-        el.click((e) => {
-            let el = jQuery(e.target);
-            let filename = el.data('param');
+      if (filename) {
+        this.App.Actions.deleteBackup(filename, el)
+      }
+    })
 
-            if (filename) {
-                this.App.Actions.deleteBackup(filename, el);
-            }
-        });
+    return this
+  }
 
-        return this;
-    }
+  /**
+   *
+   */
+  saveOptions () {
+    let el = this.App.getElement('[data-action=saveOptions]')
+    let self = this
 
-    /**
-     *
-     */
-    saveOptions() {
-        let el = this.App.getElement('[data-action=saveOptions]'),
-            self = this;
+    el.click(function () {
+      if (jQuery(this).data('param') === 'checkAmazonS3') {
+        return self.App.Actions.saveOptions({amazon_s3: true})
+      }
 
-        el.click(function () {
-            if (jQuery(this).data('param') === 'checkAmazonS3') {
-                return self.App.Actions.saveOptions({amazon_s3: true});
-            }
+      self.App.Actions.saveOptions()
+    })
 
-            self.App.Actions.saveOptions();
-        });
-
-        return this;
-    }
+    return this
+  }
 }

@@ -21,7 +21,7 @@ class AdminController extends AbstractController {
 		add_action( 'admin_menu', [ $this, 'adminMenu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'registerAssets' ] );
 		add_filter( 'plugin_action_links_' . Container::basename(), [ $this, 'pluginActionLinks' ], 10, 2 );
-		load_plugin_textdomain( Container::key(), '', trailingslashit( Container::pluginDir() . '/database-backups/' ) .
+		load_plugin_textdomain( Container::key(), '', '/database-backups/' .
 		                                              'languages' );
 	}
 
@@ -29,8 +29,10 @@ class AdminController extends AbstractController {
 	 *
 	 */
 	public function registerAssets() {
-		wp_register_script( Container::key() . '-admin', Container::pluginUrl() . 'assets/js/app.js' );
-		wp_register_style( Container::key() . '-admin', Container::pluginUrl() . 'assets/css/admin.css' );
+		wp_register_script( Container::key() . '-admin', Container::pluginUrl() . 'assets/js/app.js', [],
+			Container::version() );
+		wp_register_style( Container::key() . '-admin', Container::pluginUrl() . 'assets/css/admin.css', [],
+			Container::version() );
 	}
 
 	/**

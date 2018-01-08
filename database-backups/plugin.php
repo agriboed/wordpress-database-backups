@@ -1,7 +1,8 @@
 <?php
 /**
  * Plugin Name: Database Backups
- * Description: Simple Plugin that allows do backup of database tables. Manually or auto. Простой плагин, который позволяет делать бэкапы вашей базы данных вручную, либо в атоматическом режиме.
+ * Description: Plugin helps create copies of your database in automatic mode
+ * with some period and save them on your server and on Amazon S3.
  * Version: 1.3.0
  * Author: AGriboed
  * Text Domain: database-backups

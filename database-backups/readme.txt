@@ -12,7 +12,6 @@ Plugin helps create copies of your database in automatic mode with some period a
 == Description ==
 Plugin helps create copies of your database in automatic mode with some period and save them on your server and on Amazon S3.
 
-
 * allows deleting old copies without your participation
 * has compression to take less space
 * has feature to limit of queries to DB to reduce the load on the server
