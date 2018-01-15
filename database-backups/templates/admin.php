@@ -21,14 +21,15 @@
     <h1><?php _e( 'Database Backups', $data['key'] ); ?></h1>
 
     <div class="header-buttons">
-        <button class="button button-controls"
+        <button class="button button-primary" data-action="createBackup">
+			<?php _e( 'Create backup now', $data['key'] ); ?>
+        </button>
+
+        <button class="button button-controls options-button"
                 data-action="toggle"
                 data-param-container="options"
                 data-param-show="<?php echo empty( $data['directory'] ) ? 'true' : 'false'; ?>">
-			<?php _e( 'Settings', $data['key'] ); ?>
-        </button>
-        <button class="button button-primary" data-action="createBackup">
-			<?php _e( 'Create backup now', $data['key'] ); ?>
+		    <?php _e( 'Settings', $data['key'] ); ?>
         </button>
     </div>
     <form class="options-wrap" data-container="options" style="display: none;" data-element="optionsForm">
@@ -341,7 +342,7 @@
         </button>
     </form>
 
-    <div class="wrap">
+    <div class="backups-list">
         <h2><?php _e( 'Previously created backups', $data['key'] ); ?></h2>
 
         <table class="wp-list-table widefat striped" data-element="backupsTable">

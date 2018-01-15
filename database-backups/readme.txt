@@ -19,8 +19,6 @@ Plugin helps create copies of your database in automatic mode with some period a
 * has ability to save only "clean" version without unnecessary entries (like revisions, spam comments etc.)
 * sends a notify to you with result of the last backup
 
-Backups of database - do it simple!
-
 [Contribute on GitHub](https://github.com/agriboed/wordpress-database-backups)
 
 Support and suggestions, [Support](https://v1rus.ru/database-backups-wordpress/)

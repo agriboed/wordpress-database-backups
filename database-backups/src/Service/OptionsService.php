@@ -41,7 +41,7 @@ class OptionsService extends AbstractService {
 	 */
 	public function setOptions( array $options ) {
 		if ( isset( $options['directory'] ) && ! empty( $options['directory'] ) ) {
-			$this->setOption( 'directory', _sanitize_text_fields( $options['directory'] ) );
+			$this->setOption( 'directory', sanitize_text_field( $options['directory'] ) );
 		}
 
 		$this->setOption( 'limit', isset( $options['limit'] ) ? (int) $options['limit'] : 0 );
@@ -52,21 +52,27 @@ class OptionsService extends AbstractService {
 		$this->setOption( 'utf8', isset( $options['utf8'] ) ? true : false );
 		$this->setOption( 'cron', isset( $options['cron'] ) ? true : false );
 		$this->setOption( 'cron_frequency',
-			! empty( $options['cron_frequency'] ) ? _sanitize_text_fields( $options['cron_frequency'] ) : null );
+			! empty( $options['cron_frequency'] ) ? sanitize_text_field( $options['cron_frequency'] ) : null );
 		$this->setOption( 'delete', isset( $options['delete'] ) ? true : false );
 		$this->setOption( 'delete_days', isset( $options['delete_days'] ) ? (int) $options['delete_days'] : 0 );
 		$this->setOption( 'delete_copies', isset( $options['delete_copies'] ) ? (int) $options['delete_copies'] : 0 );
 		$this->setOption( 'amazon_s3', isset( $options['amazon_s3'] ) ? true : false );
 		$this->setOption( 'amazon_s3_region',
-			isset( $options['amazon_s3_region'] ) ? _sanitize_text_fields( $options['amazon_s3_region'] ) : null );
+			isset( $options['amazon_s3_region'] ) ? sanitize_text_field( $options['amazon_s3_region'] ) : null );
 		$this->setOption( 'amazon_s3_bucket',
-			isset( $options['amazon_s3_bucket'] ) ? _sanitize_text_fields( $options['amazon_s3_bucket'] ) : null );
+			isset( $options['amazon_s3_bucket'] ) ? sanitize_text_field( $options['amazon_s3_bucket'] ) : null );
 		$this->setOption( 'amazon_s3_key',
-			isset( $options['amazon_s3_key'] ) ? _sanitize_text_fields( $options['amazon_s3_key'] ) : null );
+			isset( $options['amazon_s3_key'] ) ? sanitize_text_field( $options['amazon_s3_key'] ) : null );
 		$this->setOption( 'amazon_s3_secret',
-			isset( $options['amazon_s3_secret'] ) ? _sanitize_text_fields( $options['amazon_s3_secret'] ) : null );
+			isset( $options['amazon_s3_secret'] ) ? sanitize_text_field( $options['amazon_s3_secret'] ) : null );
 
 		$this->validateOptions();
+
+		if ( isset( $options['cron'] ) ) {
+			CronService::createTask();
+		} else {
+			CronService::clearSchedule();
+		}
 	}
 
 	/**

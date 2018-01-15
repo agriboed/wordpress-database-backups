@@ -11,22 +11,8 @@ class CronService extends AbstractService implements HooksInterface {
 	 *
 	 */
 	public function initHooks() {
-		add_action( 'init', [ $this, 'cronCheck' ] );
-		add_filter( 'cron_schedules', [ $this, 'cronSchedules' ] );
-	}
-
-	/**
-	 * @return void
-	 */
-	public function cronCheck() {
-		try {
-			/**
-			 * @var $backupService BackupService
-			 */
-			$backupService = $this->container->get( BackupService::class );
-			$backupService->checkOldCopies();
-		} catch ( \Exception $e ) {
-		}
+		add_action( Container::key() . '-cron', [ $this, 'processTasks' ] );
+		add_filter( 'cron_schedules', [ $this, 'modifyCronSchedules' ] );
 	}
 
 	/**
@@ -36,7 +22,7 @@ class CronService extends AbstractService implements HooksInterface {
 	 *
 	 * @return array
 	 */
-	public function cronSchedules( array $schedules ) {
+	public function modifyCronSchedules( array $schedules ) {
 		$schedules['weekly']        = [
 			'interval' => 60 * 60 * 24 * 7,
 			'display'  => __( 'Once Weekly', Container::key() )
@@ -60,7 +46,39 @@ class CronService extends AbstractService implements HooksInterface {
 	/**
 	 *
 	 */
-	public function clearSchedule() {
+	public function processTasks() {
+		try {
+			/**
+			 * @var $backupService BackupService
+			 */
+			$backupService = $this->container->get( BackupService::class );
+			$backupService->createBackup();
+			$backupService->checkOldCopies();
+		} catch ( \Exception $e ) {
+		}
+	}
+
+	/**
+	 *
+	 */
+	public static function createTask() {
+		if ( false === OptionsService::getOption( 'cron' ) ) {
+			return;
+		}
+
 		wp_clear_scheduled_hook( Container::key() . '-cron' );
+
+		if ( ! wp_next_scheduled( Container::key() . '-cron' ) ) {
+			wp_schedule_event( time(), OptionsService::getOption( 'cron_frequency' ), Container::key() . '-cron' );
+		}
+	}
+
+	/**
+	 *
+	 */
+	public static function clearSchedule() {
+		if ( false === OptionsService::getOption('cron')) {
+			wp_clear_scheduled_hook( Container::key() . '-cron' );
+		}
 	}
 }
