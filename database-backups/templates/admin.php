@@ -415,7 +415,7 @@
       admin_url: '<?php echo $data['admin_url']; ?>',
       nonce: '<?php echo $data['nonce'];?>',
       lang: {
-        confirm: '<?php _e( 'Are you sure?' );?>',
+        confirm: '<?php _e( 'Are you sure?' , $data['key'] );?>',
       },
     })
   })

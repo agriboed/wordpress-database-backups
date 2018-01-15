@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Database Backup\n"
-"POT-Creation-Date: 2018-01-16 00:18+0300\n"
-"PO-Revision-Date: 2018-01-16 00:18+0300\n"
+"POT-Creation-Date: 2018-01-16 00:43+0300\n"
+"PO-Revision-Date: 2018-01-16 00:44+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -302,6 +302,10 @@ msgstr ""
 #: templates/admin.php:388
 msgid "Delete"
 msgstr "Удалить"
+
+#: templates/admin.php:418
+msgid "Are you sure?"
+msgstr "Вы уверены?"
 
 #~ msgid "Database Backup was not created at"
 #~ msgstr "Database Backup не был создан на"
