@@ -10,13 +10,14 @@ use DatabaseBackups\Interfaces\HooksInterface;
  * @package DatabaseBackups\Controller
  */
 class AbstractController implements DependencyInterface, HooksInterface {
+
 	/**
 	 * @var $container Container
 	 */
 	protected $container;
 
 	/**
-	 *
+	 * Init WP hooks
 	 */
 	public function initHooks() {
 	}

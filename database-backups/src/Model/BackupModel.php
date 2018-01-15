@@ -9,6 +9,7 @@ use DatabaseBackups\Core\AbstractModel;
  * @package DatabaseBackups\Model
  */
 class BackupModel extends AbstractModel {
+
 	/**
 	 * @var array
 	 */

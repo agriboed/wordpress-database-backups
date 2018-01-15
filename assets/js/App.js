@@ -11,6 +11,9 @@ class App {
     this.key = options.key
     this.url = options.admin_url
     this.nonce = options.nonce
+    this.lang = {
+      confirm: options.lang.confirm
+    }
     this.apiAction = 'database-backups_'
     this.container = jQuery('.database-backups')
     this.Events = new Events(this)

@@ -5,6 +5,7 @@ namespace DatabaseBackups\Core;
 use DatabaseBackups\Interfaces\DependencyInterface;
 
 class AbstractService implements DependencyInterface {
+
 	/**
 	 * @var Container
 	 */
@@ -12,6 +13,8 @@ class AbstractService implements DependencyInterface {
 
 	/**
 	 * @param Container $container
+	 *
+	 * @return void
 	 */
 	public function setContainer( Container $container ) {
 		$this->container = $container;

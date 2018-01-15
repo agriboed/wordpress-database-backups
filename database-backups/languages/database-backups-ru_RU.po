@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Database Backup\n"
-"POT-Creation-Date: 2018-01-15 23:48+0300\n"
-"PO-Revision-Date: 2018-01-15 23:55+0300\n"
+"POT-Creation-Date: 2018-01-16 00:18+0300\n"
+"PO-Revision-Date: 2018-01-16 00:18+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -16,82 +16,82 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: src/Controller/AdminController.php:42 src/Controller/AdminController.php:43
+#: src/Controller/AdminController.php:43 src/Controller/AdminController.php:44
 #: templates/admin.php:21
 msgid "Database Backups"
-msgstr "Бэкапы базы"
+msgstr "Резервные копии БД"
 
-#: src/Controller/AdminController.php:57 templates/admin.php:32
+#: src/Controller/AdminController.php:58 templates/admin.php:32
 msgid "Settings"
 msgstr "Настройки"
 
-#: src/Controller/AjaxController.php:40 src/Controller/AjaxController.php:49
-#: src/Controller/AjaxController.php:66
+#: src/Controller/AjaxController.php:41 src/Controller/AjaxController.php:50
+#: src/Controller/AjaxController.php:69
 msgid "Security error"
-msgstr "Ошибка"
+msgstr "Ошибка безопасности"
 
-#: src/Controller/AjaxController.php:73
+#: src/Controller/AjaxController.php:76
 msgid "Nothing to save"
 msgstr "Нечего сохранять"
 
-#: src/Controller/AjaxController.php:85
-msgid "Options saved."
-msgstr "Настройки сохранены."
-
-#: src/Controller/AjaxController.php:95
-msgid "Amazon S3 connection is successful."
-msgstr "Amazon S3 успешно подключен."
+#: src/Controller/AjaxController.php:88
+msgid "Options saved"
+msgstr "Настройки сохранены"
 
 #: src/Controller/AjaxController.php:98
+msgid "Amazon S3 connection is successful"
+msgstr "Amazon S3 успешно подключен"
+
+#: src/Controller/AjaxController.php:101
 msgid "Amazon S3 connection failed"
 msgstr "Amazon S3 не подключен"
 
-#: src/Controller/AjaxController.php:123
+#: src/Controller/AjaxController.php:128
 msgid "Backup not created"
 msgstr "Бэкап не создан"
 
-#: src/Controller/AjaxController.php:129
+#: src/Controller/AjaxController.php:134
 msgid "Backup created successful"
 msgstr "Резервная копия создана успешно"
 
-#: src/Controller/AjaxController.php:161
+#: src/Controller/AjaxController.php:168
 msgid "Backup not deleted"
 msgstr "Резервная копия не удалена"
 
-#: src/Controller/AjaxController.php:164
+#: src/Controller/AjaxController.php:171
 msgid "Backup deleted"
 msgstr "Резервная копия удалена"
 
-#: src/Service/BackupService.php:328
+#: src/Service/BackupService.php:329
 msgid "Backup not created on"
 msgstr "Резервная копия успешно создана в"
 
-#: src/Service/BackupService.php:329
+#: src/Service/BackupService.php:330
 msgid "Backup not created. Please check your settings."
 msgstr "Резервная копия не создана. Пожалуйста, проверьте настройки."
 
-#: src/Service/BackupService.php:331 src/Service/BackupService.php:335
+#: src/Service/BackupService.php:332 src/Service/BackupService.php:336
 #: templates/admin.php:354
 msgid "Date"
 msgstr "Дата"
 
-#: src/Service/BackupService.php:333
+#: src/Service/BackupService.php:334
 msgid "Database Backup was created at "
 msgstr "Резервная копия была создана "
 
-#: src/Service/BackupService.php:334
+#: src/Service/BackupService.php:335
 msgid "Database Backup successfully created."
 msgstr "Database Backup успешно создан."
 
-#: src/Service/BackupService.php:336
+#: src/Service/BackupService.php:337
 msgid "Size"
 msgstr "Размер"
 
-#: src/Service/BackupService.php:338
+#: src/Service/BackupService.php:339
 msgid "Extension"
 msgstr "Расширение"
 
-#: src/Service/BackupService.php:339 templates/admin.php:384
+#: src/Service/BackupService.php:340 templates/admin.php:384
 msgid "Download"
 msgstr "Скачать"
 
@@ -113,7 +113,7 @@ msgstr "Два раза в месяц"
 
 #: templates/admin.php:25 templates/admin.php:406
 msgid "Create backup now"
-msgstr ""
+msgstr "Создать копию сейчас"
 
 #: templates/admin.php:40
 msgid "Directory name"
@@ -253,10 +253,10 @@ msgstr "Amazon S3 Key"
 
 #: templates/admin.php:314
 msgid ""
-"Your can create your access keys in <a href=\"https://console.aws.amazon.com/"
-"iam/home?#/security_credential\" target=\"_blank\">Amazon S3 Console</a>."
+"You can create access keys in <a href=\"https://console.aws.amazon.com/iam/"
+"home?#/security_credential\" target=\"_blank\">Amazon S3 Console</a>."
 msgstr ""
-"Вы можете создать свои ключи в  <a href=\"https://console.aws.amazon.com/iam/"
+"Вы можете создать свои ключи в <a href=\"https://console.aws.amazon.com/iam/"
 "home?#/security_credential\" target=\"_blank\">Amazon S3 Console</a>."
 
 #: templates/admin.php:322

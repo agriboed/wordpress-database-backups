@@ -29,7 +29,7 @@
                 data-action="toggle"
                 data-param-container="options"
                 data-param-show="<?php echo empty( $data['directory'] ) ? 'true' : 'false'; ?>">
-		    <?php _e( 'Settings', $data['key'] ); ?>
+			<?php _e( 'Settings', $data['key'] ); ?>
         </button>
     </div>
     <form class="options-wrap" data-container="options" style="display: none;" data-element="optionsForm">
@@ -311,7 +311,7 @@
                 </td>
                 <td>
                     <p class="description">
-						<?php _e( 'Your can create your access keys in <a href="https://console.aws.amazon.com/iam/home?#/security_credential" target="_blank">Amazon S3 Console</a>.',
+						<?php _e( 'You can create access keys in <a href="https://console.aws.amazon.com/iam/home?#/security_credential" target="_blank">Amazon S3 Console</a>.',
 							$data['key'] ); ?>
                     </p>
                 </td>
@@ -414,6 +414,9 @@
       key: '<?php echo $data['key'];?>',
       admin_url: '<?php echo $data['admin_url']; ?>',
       nonce: '<?php echo $data['nonce'];?>',
+      lang: {
+        confirm: '<?php _e( 'Are you sure?' );?>',
+      },
     })
   })
 </script>

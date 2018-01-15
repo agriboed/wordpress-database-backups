@@ -5,6 +5,7 @@ namespace DatabaseBackups\Core;
 use DatabaseBackups\Interfaces\DependencyInterface;
 
 class AbstractModel implements DependencyInterface {
+
 	/**
 	 * @var \PDO
 	 */

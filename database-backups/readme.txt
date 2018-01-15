@@ -28,8 +28,6 @@ skype: agriboed
 
 * English (default)
 * Русский (ru_RU)
-* Беларуская (be_BE)
-* Polski (pl_PL)
 
 == Installation ==
 1. Upload the `database-backup` folder to the `/wp-content/plugins/` directory

@@ -13,13 +13,14 @@ use DatabaseBackups\Core\Container;
  * @package DatabaseBackups\Controller
  */
 class AjaxController extends AbstractController {
+
 	/**
 	 * @var array
 	 */
 	protected $data;
 
 	/**
-	 *
+	 * Init WP hooks
 	 */
 	public function initHooks() {
 		add_action( 'wp_ajax_' . Container::key() . '_options', [ $this, 'saveOptions' ] );
@@ -59,6 +60,8 @@ class AjaxController extends AbstractController {
 	 *
 	 * @throws \DatabaseBackups\Exceptions\Exception
 	 * @throws \InvalidArgumentException
+	 *
+	 * @return string
 	 */
 	public function saveOptions() {
 		if ( false === $this->checkNonce() ) {
@@ -82,7 +85,7 @@ class AjaxController extends AbstractController {
 		$optionsService->setOptions( $_POST['options'] );
 
 		$this->data['success'] = true;
-		$this->data['message'] = __( 'Options saved.', Container::key() );
+		$this->data['message'] = __( 'Options saved', Container::key() );
 
 		if ( ! empty( $_POST['amazon_s3'] ) && 'true' === $_POST['amazon_s3'] ) {
 			/**
@@ -92,7 +95,7 @@ class AjaxController extends AbstractController {
 
 			if ( $s3Service->isConnected() ) {
 				$this->data['success'] = true;
-				$this->data['message'] .= ' ' . __( 'Amazon S3 connection is successful.', Container::key() );
+				$this->data['message'] .= ' ' . __( 'Amazon S3 connection is successful', Container::key() );
 			} else {
 				$this->data['success'] = false;
 				$this->data['message'] .= ' ' . __( 'Amazon S3 connection failed', Container::key() );
@@ -106,6 +109,8 @@ class AjaxController extends AbstractController {
 	 * Method: POST
 	 *
 	 * @throws \Exception
+	 *
+	 * @return string
 	 */
 	public function createBackup() {
 		if ( false === $this->checkNonce() ) {
@@ -136,6 +141,8 @@ class AjaxController extends AbstractController {
 	 * Method: POST
 	 *
 	 * @throws \Exception
+	 *
+	 * @return string
 	 */
 	public function deleteBackup() {
 		if ( false === $this->checkNonce() ) {

@@ -2,14 +2,15 @@
 
 namespace DatabaseBackups\Core;
 
-use DatabaseBackups\Exceptions\Exception;
 use DatabaseBackups\Interfaces\DependencyInterface;
+use DatabaseBackups\Exceptions\Exception;
 
 /**
  * Class Container
  * @package Openwork\DependencyInjection
  */
 class Container {
+
 	/**
 	 * @var array
 	 *
@@ -108,8 +109,10 @@ class Container {
 	 * @param string $dependency
 	 * @param array $arguments
 	 *
-	 * @return mixed
+	 * @throws \ReflectionException
 	 * @throws Exception
+	 *
+	 * @return mixed
 	 */
 	public function get( $dependency, array $arguments = [] ) {
 		if ( ! isset( $this->dependencies[ $dependency ] ) ) {

@@ -12,6 +12,7 @@ use DatabaseBackups\Core\Container;
  * @package DatabaseBackups\Service
  */
 class BackupService extends AbstractService {
+
 	/**
 	 * @var array
 	 */

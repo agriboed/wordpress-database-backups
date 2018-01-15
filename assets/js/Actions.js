@@ -134,7 +134,7 @@ class Actions {
    * @param el
    */
   deleteBackup (backup, el) {
-    if (!confirm('Are you sure?')) {
+    if (!confirm(this.App.lang.confirm)) {
       return
     }
 

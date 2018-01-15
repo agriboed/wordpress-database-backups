@@ -14,6 +14,7 @@ use DatabaseBackups\Core\Container;
  * @package DatabaseBackups\Controller
  */
 class AdminController extends AbstractController {
+
 	/**
 	 * Init WP hooks
 	 */
@@ -61,6 +62,7 @@ class AdminController extends AbstractController {
 
 	/**
 	 *
+	 * @throws \InvalidArgumentException
 	 * @throws Exception
 	 */
 	public function renderPage() {
