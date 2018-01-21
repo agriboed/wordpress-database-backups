@@ -3,7 +3,9 @@
 namespace DatabaseBackups\Service;
 
 use DatabaseBackups\Core\AbstractService;
+use DatabaseBackups\Entity\Object;
 use DatabaseBackups\Exceptions\Exception;
+use DatabaseBackups\Interfaces\ObjectInterface;
 use DatabaseBackups\Model\BackupModel;
 use DatabaseBackups\Core\Container;
 
@@ -44,6 +46,11 @@ class BackupService extends AbstractService {
 	protected $filename = '';
 
 	/**
+	 * @var ObjectInterface
+	 */
+	protected $object;
+
+	/**
 	 * @return bool
 	 *
 	 * @throws \Exception
@@ -70,8 +77,8 @@ class BackupService extends AbstractService {
 				->createSql()
 				->convertGzip()
 				->convertEncoding()
-				->createFile()
-				->putAmazonS3()
+				->createObject()
+				->putStorages()
 				->sendNotification();
 
 			return $this->filename;
@@ -278,14 +285,16 @@ class BackupService extends AbstractService {
 	 * @return $this
 	 * @throws \RuntimeException
 	 */
-	protected function createFile() {
+	protected function createObject() {
 		if ( empty( $this->sql ) ) {
 			throw new \RuntimeException( 'SQL is empty' );
 		}
 
-		$handle = fopen( $this->directory . $this->filename, 'wb+' );
-		fwrite( $handle, $this->sql );
-		fclose( $handle );
+		$this->object = new Object();
+		$this
+			->object
+			->setName($this->filename)
+			->setBody($this->sql);
 
 		return $this;
 	}
@@ -295,16 +304,14 @@ class BackupService extends AbstractService {
 	 * @throws \InvalidArgumentException
 	 * @throws \DatabaseBackups\Exceptions\Exception
 	 */
-	protected function putAmazonS3() {
-		if ( true !== (bool) OptionsService::getOption( 'amazon_s3' ) ) {
-			return $this;
-		}
+	protected function putStorages() {
 
 		/**
-		 * @var $s3Service S3Service
+		 * @var $storageService StorageService
 		 */
-		$s3Service = $this->container->get( S3Service::class );
-		$s3Service->set( $this->filename, $this->sql );
+		$storageService = $this->container->get(StorageService::class);
+		$storageService->connect();
+		$storageService->putObject($this->object );
 
 		return $this;
 	}
@@ -351,44 +358,11 @@ class BackupService extends AbstractService {
 	 * @throws Exception
 	 */
 	protected function readBackups() {
-		$this->backups = [];
-		$dh            = opendir( $this->directory );
-		$files         = [];
-
-		$date_format = get_option( 'date_format' );
-
-		while ( ( $name = readdir( $dh ) ) !== false ) {
-			if ( $name !== '.' && $name !== '..' ) {
-				$file = $this->directory . $name;
-				if ( filetype( $file ) === 'file' && ( substr( $file, - 4 ) === '.sql' || substr( $file,
-							- 7 ) === '.sql.gz' ) ) {
-					$format = '';
-
-					if ( substr( $file, - 4 ) === '.sql' ) {
-						$format = 'sql';
-					}
-
-					if ( substr( $file, - 7 ) === '.sql.gz' ) {
-						$format = 'gz';
-					}
-
-					$files[] = [
-						'name'      => $name,
-						'icon'      => $format === 'gz' ? 'dashicons-portfolio' : 'dashicons-media-spreadsheet',
-						'size'      => filesize( $file ),
-						'size_mb'   => round( filesize( $file ) / 1024 / 1024, 2 ),
-						'url'       => $this->url . $name,
-						'date'      => filemtime( $file ),
-						'date_i18n' => date_i18n( $date_format . ' H:i:s', filemtime( $file ) ),
-						'format'    => $format,
-					];
-				}
-			}
-		}
-
-		rsort( $files );
-
-		$this->backups = $files;
+		/**
+		 * @var $storageService StorageService
+		 */
+		$storageService = $this->container->get(StorageService::class);
+		$storageService->getObjectsList();
 
 		return $this;
 	}
@@ -430,29 +404,19 @@ class BackupService extends AbstractService {
 	/**
 	 * @param $filename
 	 *
-	 * @return bool
+	 * @return $this
+	 *
 	 * @throws \InvalidArgumentException
 	 * @throws \DatabaseBackups\Exceptions\Exception
 	 */
 	public function deleteBackup( $filename ) {
-		$this->directory = WP_CONTENT_DIR . '/' . OptionsService::getOption( 'directory' ) . '/';
-		$filename        = str_replace( [ '../', './', '/' ], '', $filename );
+		/**
+		 * @var $storageService StorageService
+		 */
+		$storageService = $this->container->get(StorageService::class);
 
-		if ( ! is_file( $this->directory . $filename ) ||
-		     ! mb_substr( $filename, - 4 ) === '.sql' || ! mb_substr( $filename, - 7 ) === '.sql.gz'
-		) {
-			return false;
-		}
-
-		if ( true === (bool) OptionsService::getOption( 'amazon_s3' ) ) {
-			/**
-			 * @var $s3Service S3Service
-			 */
-			$s3Service = $this->container->get( S3Service::class );
-			$s3Service->delete( $filename );
-		}
-
-		return unlink( $this->directory . $filename );
+		$storageService->deleteObject($filename);
+		return $this;
 	}
 
 	/**

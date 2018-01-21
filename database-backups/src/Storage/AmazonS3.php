@@ -2,13 +2,20 @@
 
 namespace DatabaseBackups\Service;
 
-use Aws\Exception\AwsException;
-use DatabaseBackups\Core\AbstractService;
+use DatabaseBackups\Interfaces\ObjectInterface;
+use DatabaseBackups\Interfaces\StorageInterface;
 use DatabaseBackups\Exceptions\Exception;
 use Aws\S3\Exception\S3Exception;
+use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 
-class S3Service extends AbstractService {
+class AmazonS3 implements StorageInterface {
+
+	/**
+	 * @var string
+	 */
+	protected static $name = 'Amazon S3';
+
 	/**
 	 * @var $client S3Client
 	 */
@@ -25,10 +32,14 @@ class S3Service extends AbstractService {
 	protected $region;
 
 	/**
-	 * S3Service constructor.
-	 * @throws \InvalidArgumentException
+	 * @var array
 	 */
-	public function __construct() {
+	protected static $objects;
+
+	/**
+	 *
+	 */
+	public function connect() {
 		$this->bucket = OptionsService::getOption( 'amazon_s3_bucket' );
 
 		if ( empty( $this->bucket ) ) {
@@ -46,7 +57,7 @@ class S3Service extends AbstractService {
 			] );
 
 			//check region
-			$this->client->listObjects( [
+			static::$objects = $this->client->listObjects( [
 				'Bucket' => $this->bucket,
 			] );
 		} catch ( Exception $exception ) {
@@ -55,8 +66,8 @@ class S3Service extends AbstractService {
 		} catch ( AwsException $exception ) {
 			echo $exception->getMessage();
 		}
-
 	}
+
 
 	/**
 	 *
@@ -74,7 +85,7 @@ class S3Service extends AbstractService {
 	 * @return \Aws\Result|null
 	 * @throws \InvalidArgumentException
 	 */
-	public function get( $key ) {
+	public function getObject( $key ) {
 		if ( false === $this->isConnected() ) {
 			return null;
 		}
@@ -92,7 +103,7 @@ class S3Service extends AbstractService {
 	 * @return bool
 	 * @throws \InvalidArgumentException
 	 */
-	public function delete( $key ) {
+	public function deleteObject( $key ) {
 		if ( false === $this->isConnected() ) {
 			return false;
 		}
@@ -118,7 +129,7 @@ class S3Service extends AbstractService {
 	 * @return bool
 	 * @throws \InvalidArgumentException
 	 */
-	public function set( $key, $data ) {
+	public function putObject( ObjectInterface $object ) {
 		if ( false === $this->isConnected() ) {
 			return false;
 		}
@@ -127,8 +138,8 @@ class S3Service extends AbstractService {
 			$this->client->putObject( [
 				'Region' => $this->region,
 				'Bucket' => $this->bucket,
-				'Key'    => $key,
-				'Body'   => $data,
+				'Key'    => $object->getName(),
+				'Body'   => $object->getBody(),
 				'ACL'    => 'private',
 			] );
 
@@ -137,5 +148,21 @@ class S3Service extends AbstractService {
 		}
 
 		return true;
+	}
+
+	/**
+	 *
+	 */
+	public function getObjectsList()
+	{
+
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return static::$name;
 	}
 }

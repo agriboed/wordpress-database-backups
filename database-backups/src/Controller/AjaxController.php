@@ -5,7 +5,7 @@ namespace DatabaseBackups\Controller;
 use DatabaseBackups\Core\AbstractController;
 use DatabaseBackups\Service\OptionsService;
 use DatabaseBackups\Service\BackupService;
-use DatabaseBackups\Service\S3Service;
+use DatabaseBackups\Service\AmazonS3;
 use DatabaseBackups\Core\Container;
 
 /**
@@ -89,9 +89,9 @@ class AjaxController extends AbstractController {
 
 		if ( ! empty( $_POST['amazon_s3'] ) && 'true' === $_POST['amazon_s3'] ) {
 			/**
-			 * @var $s3Service S3Service
+			 * @var $s3Service AmazonS3
 			 */
-			$s3Service = $this->container->get( S3Service::class );
+			$s3Service = $this->container->get( AmazonS3::class );
 
 			if ( $s3Service->isConnected() ) {
 				$this->data['success'] = true;
